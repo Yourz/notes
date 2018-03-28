@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,Javascript,跨域," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="什么是跨域之所以有跨域(Cross-Origin, 也译作跨源)这种操作方式，是为了解决浏览器同源策略。同源，即协议相同、域名相同及端口相同。同源策略最早被网景引入是为了保证用户信息的安全，防止恶意的网站窃取数据。最初非同源限制是cookie，现在包括dom和xhr及fetch请求都不能跨域访问。 不受同源策略限制的情况也有很多，如：  &amp;lt;script src=&amp;quot;...&amp;quot;">
+<meta name="keywords" content="前端,Javascript,跨域">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跨域的原理及解决方案">
+<meta property="og:url" content="https://yourz.github.io/notes/2016/04/28/x-origin/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="什么是跨域之所以有跨域(Cross-Origin, 也译作跨源)这种操作方式，是为了解决浏览器同源策略。同源，即协议相同、域名相同及端口相同。同源策略最早被网景引入是为了保证用户信息的安全，防止恶意的网站窃取数据。最初非同源限制是cookie，现在包括dom和xhr及fetch请求都不能跨域访问。 不受同源策略限制的情况也有很多，如：  &amp;lt;script src=&amp;quot;...&amp;quot;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg">
+<meta property="og:image" content="http://p1.meituan.net/scarlett/5f58e31785e93c1fb612e3ea8a9be8c474880.jpg">
+<meta property="og:image" content="http://p1.meituan.net/scarlett/74368f56cbc1acaf67375c5dbabb0cd2180206.jpg">
+<meta property="og:updated_time" content="2018-03-28T13:00:13.174Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跨域的原理及解决方案">
+<meta name="twitter:description" content="什么是跨域之所以有跨域(Cross-Origin, 也译作跨源)这种操作方式，是为了解决浏览器同源策略。同源，即协议相同、域名相同及端口相同。同源策略最早被网景引入是为了保证用户信息的安全，防止恶意的网站窃取数据。最初非同源限制是cookie，现在包括dom和xhr及fetch请求都不能跨域访问。 不受同源策略限制的情况也有很多，如：  &amp;lt;script src=&amp;quot;...&amp;quot;">
+<meta name="twitter:image" content="http://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2016/04/28/x-origin/"/>
+
+
+
+
+
+  <title>跨域的原理及解决方案 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2016/04/28/x-origin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">跨域的原理及解决方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-28T19:54:26+08:00">
+                2016-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/基础总结/" itemprop="url" rel="index">
+                    <span itemprop="name">基础总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="什么是跨域"><a href="#什么是跨域" class="headerlink" title="什么是跨域"></a>什么是跨域</h1><p>之所以有跨域(Cross-Origin, 也译作跨源)这种操作方式，是为了解决浏览器同源策略。同源，即协议相同、域名相同及端口相同。同源策略最早被网景引入是为了保证用户信息的安全，防止恶意的网站窃取数据。最初非同源限制是cookie，现在包括dom和xhr及fetch请求都不能跨域访问。</p>
+<p>不受同源策略限制的情况也有很多，如：</p>
+<ol>
+<li><code>&lt;script src=&quot;...&quot;&gt;&lt;/script&gt;</code>标签嵌入跨域脚本;</li>
+<li><code>&lt;link rel=&quot;stylesheet&quot; href=&quot;...&quot;&gt;</code>标签嵌入CSS;</li>
+<li><code>&lt;img&gt;</code>嵌入图片;</li>
+<li><code>&lt;video&gt;</code> 和 <code>&lt;audio&gt;</code>嵌入多媒体资源;</li>
+<li><code>&lt;object&gt;</code>, <code>&lt;embed&gt;</code> 和 <code>&lt;applet&gt;</code>的插件;</li>
+<li><code>@font-face</code>引入的字体;</li>
+<li><code>&lt;frame&gt;</code> 和 <code>&lt;iframe&gt;</code>载入的任何资源.</li>
+</ol>
+<p>通过这些“例外”情况，就给了程序员们可乘之机，涌现出了许多奇技淫巧，这类跨域的解决方案姑且称之为hack流。</p>
+<p>与此同时，w3c听取了程序员们对于跨域请求的渴望，推出了cors标准，通过设置服务器以达到ajax的跨域请求，html5也适时推出了postMessage api以满足跨域通信。这种官方开门允许跨域的方法，我们姑且称之为正统流。</p>
+<h1 id="跨域访问的解决方案"><a href="#跨域访问的解决方案" class="headerlink" title="跨域访问的解决方案"></a>跨域访问的解决方案</h1><p>如上文所言，从原理上，跨域的解决方案可以大概分为正统流和hack流两大类。下面具体分别来介绍各种解决方法的实现。<br><img src="http://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg" alt="Classification"></p>
+<h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><h3 id="Hack流"><a href="#Hack流" class="headerlink" title="Hack流"></a>Hack流</h3><h4 id="IMG-Ping——利用图片的跨域特性"><a href="#IMG-Ping——利用图片的跨域特性" class="headerlink" title="IMG Ping——利用图片的跨域特性"></a>IMG Ping——利用图片的跨域特性</h4><p>我们每天浏览很多的网页，有时候可能会发现某些图片（<code>&lt;img&gt;</code>）是来自其他网站的，其实你看到的就是一种跨域，由于图片不受“同源策略”限制，我们就可以利用图片进行跨域了。我们将图片的src属性指向请求的地址，通过监听load和error事件，就能知道响应什么时候接受了,响应的数据可以是任意内容，但通常是204响应（No content 没有响应体）。图像ping的例子如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> btn = <span class="built_in">document</span>.querySelector(<span class="string">"#start-ping"</span>); </span><br><span class="line">btn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; </span><br><span class="line">    <span class="keyword">var</span> img = <span class="keyword">new</span> Image();</span><br><span class="line">    img.onload = img.onerror = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">document</span>.querySelector(<span class="string">"#result"</span>).innerHTML = <span class="string">"finished"</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">    img.src = <span class="string">"http://localhost:3000/img?r="</span>+<span class="built_in">Math</span>.random();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>服务器端代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">router.get(<span class="string">'/img'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123; </span><br><span class="line">  res.send(<span class="string">'success!'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>然而在实际使用中会发现，无法获取相应文本。</p>
+<p><strong>优点</strong>：兼容性好；<strong>缺点</strong>：只支持Get请求且无法获取相应。</p>
+<h4 id="JSONP——利用script标签的跨域特性"><a href="#JSONP——利用script标签的跨域特性" class="headerlink" title="JSONP——利用script标签的跨域特性"></a>JSONP——利用script标签的跨域特性</h4><p>JSONP是JSON with padding（填充式JSON）的简写，是应用JSON的一种方法，看起来和JSON差不多，只不过是被包含在函数调用中的JSON。例如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">callback(&#123;<span class="string">"key"</span>:<span class="string">"val"</span>&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>JSONP由两部分组成：回调函数和数据，回调函数是响应到来时应该在页面中调用的函数，而数据是传入回调函数中的JSON数据（服务器填充的）。下面就是一个典型的JSONP请求：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//example.com/jsonp?callback=handleResponse</span></span><br></pre></td></tr></table></figure></p>
+<p>JSONP也是不受“同源策略”限制的，原因和图片ping是一样的，<code>&lt;script&gt;</code>标签也可以跨域，因此我们可以通过利用JONP来动态创建<code>&lt;script&gt;</code>，并将其src指向一个跨域的URL，就可以完成和跨域得服务器之间的通信了。下面就来看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> btn2 = <span class="built_in">document</span>.querySelector(<span class="string">"#start-jsonp"</span>); </span><br><span class="line">btn2.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; </span><br><span class="line">    <span class="keyword">var</span> script = <span class="built_in">document</span>.createElement(<span class="string">"script"</span>);</span><br><span class="line">    script.src = <span class="string">"http://localhost:3000/jsonp"</span>;</span><br><span class="line">    <span class="built_in">document</span>.body.insertBefore(script, <span class="built_in">document</span>.body.firstChild);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pagefunc</span>(<span class="params">num</span>)</span>&#123; </span><br><span class="line">    <span class="built_in">document</span>.querySelector(<span class="string">"#result2"</span>).innerHTML = <span class="string">"我从服务器获得了一个随机数："</span>+num;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>服务器代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">router.get(<span class="string">'/jsonp'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123;</span><br><span class="line">    res.send(<span class="string">'pagefunc('</span> + <span class="built_in">Math</span>.random() + <span class="string">')'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>JSONP是非常简单易用的，与图像ping相比，优点就是能直接访问响应文本，能够在服务器与客户端建立双向通信。但是JSONP也是有缺点的：JSONP直接从其他域加载代码执行，如果其他域不安全，可能会在响应中夹带一些恶意代码。其次，要确定JSONP请求是否失败并不容易，HTML5为<code>&lt;script&gt;</code>增加了onerror方法，但是目前支持度还不是很好。</p>
+<p><strong>优点</strong>：简单易用，可以获取响应文本；<strong>缺点</strong>：只能get，不易获取错误。</p>
+<h4 id="iframe实现跨域通信"><a href="#iframe实现跨域通信" class="headerlink" title="iframe实现跨域通信"></a>iframe实现跨域通信</h4><p>iframe的src可以指向不同域的地址，如果我们新建一个iframe元素将其指向所需跨域请求的地址是否就可以实现跨域通信了呢？然而事实是，iframe跨域的话将会取不到其dom元素。幸好前辈程序员们孜孜不倦的追求中，从iframe的一些特性中找到了空子可钻。</p>
+<h5 id="端口协议主域相同、子域不同"><a href="#端口协议主域相同、子域不同" class="headerlink" title="端口协议主域相同、子域不同"></a>端口协议主域相同、子域不同</h5><p>对于主域相同而子域不同的例子，可以通过设置document.domain的办法来解决。具体的做法是可以在<a href="http://www.a.com/a.html和http://script.a.com/b.html两个文件中分别加上document.domain" target="_blank" rel="noopener">http://www.a.com/a.html和http://script.a.com/b.html两个文件中分别加上document.domain</a> = ‘a.com’；然后通过a.html文件中创建一个iframe，去控制iframe的contentDocument，这样两个js文件之间就可以“交互”了。当然这种办法只能解决主域相同而二级域名不同的情况，如果你异想天开的把script.a.com的domian设为alibaba.com的话，就会报错了。</p>
+<p><a href="http://www.a.com上的a.html" target="_blank" rel="noopener">www.a.com上的a.html</a>:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.domain = <span class="string">'a.com'</span>;</span><br><span class="line"><span class="keyword">var</span> ifr = <span class="built_in">document</span>.createElement(<span class="string">'iframe'</span>);</span><br><span class="line">ifr.src = <span class="string">'http://script.a.com/b.html'</span>;</span><br><span class="line">ifr.style.display = <span class="string">'none'</span>;</span><br><span class="line"><span class="built_in">document</span>.body.appendChild(ifr);</span><br><span class="line">ifr.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> doc = ifr.contentDocument || ifr.contentWindow.document;</span><br><span class="line">    <span class="comment">// 在这里操纵b.html</span></span><br><span class="line">    alert(doc.getElementsByTagName(<span class="string">"h1"</span>)[<span class="number">0</span>].childNodes[<span class="number">0</span>].nodeValue);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>script.a.com上的b.html:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">document</span>.domain = <span class="string">'a.com'</span>;</span><br></pre></td></tr></table></figure></p>
+<h5 id="子域也不同"><a href="#子域也不同" class="headerlink" title="子域也不同"></a>子域也不同</h5><p>常用的有两种方法：利用location.hash改变页面不刷新的特性或者window.name在src改变的情况下不发生改变的特性进行跨域通信。</p>
+<h6 id="location-hash"><a href="#location-hash" class="headerlink" title="location.hash"></a>location.hash</h6><p>假设域名a.com下的文件a.html要和b.com域名下的b.html传递信息。</p>
+<ol>
+<li>a.html首先创建自动创建一个隐藏的iframe，iframe的src指向b.com域名下的b.html页面；</li>
+<li>b.html响应请求后再将通过修改a.html的hash值来传递数据。由于两个页面不在同一个域下IE、Chrome不允许修改parent.location.hash的值，所以要借助于a.com域名下的一个代理iframe;</li>
+<li>同时在a.html上加一个定时器(支持onhashchange事件的话可以监听该事件)，隔一段时间来判断location.hash的值有没有变化，一旦有变化则获取获取hash值。</li>
+</ol>
+<p>a.com/a.html:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">startRequest</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> ifr = <span class="built_in">document</span>.createElement(<span class="string">'iframe'</span>);</span><br><span class="line">    ifr.style.display = <span class="string">'none'</span>;</span><br><span class="line">    ifr.src = <span class="string">'http://www.b.com/b.html#do'</span>;</span><br><span class="line">    <span class="built_in">document</span>.body.appendChild(ifr);</span><br><span class="line">&#125;</span><br><span class="line">startRequest();</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">checkHash</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> data = location.hash ? location.hash.substring(<span class="number">1</span>) : <span class="string">''</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">console</span>.log) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">'data: '</span>+data);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span>(e) &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line">setInterval(checkHash, <span class="number">2000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>b.com/b.html:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//模拟一个简单的参数处理操作</span></span><br><span class="line"><span class="keyword">switch</span>(location.hash)&#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'#do'</span>:</span><br><span class="line">        callBack();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> <span class="string">'#did'</span>:</span><br><span class="line">        <span class="comment">//do something……</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">callBack</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        parent.location.hash = <span class="string">'somedata'</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="comment">// ie、chrome的安全机制无法修改parent.location.hash，</span></span><br><span class="line">        <span class="comment">// 所以要利用一个中间的b.com域下的代理iframe</span></span><br><span class="line">        <span class="keyword">var</span> ifrproxy = <span class="built_in">document</span>.createElement(<span class="string">'iframe'</span>);</span><br><span class="line">        ifrproxy.style.display = <span class="string">'none'</span>;</span><br><span class="line">        ifrproxy.src = <span class="string">'http://a.com/c.html#somedata'</span>;    <span class="comment">// 注意该文件在"a.com"域下</span></span><br><span class="line">        <span class="built_in">document</span>.body.appendChild(ifrproxy);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>a.com/c.html:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parent.parent.location.hash = self.location.hash.substring(<span class="number">1</span>);</span><br></pre></td></tr></table></figure></p>
+<p><strong>优点</strong>：1.可以解决域名完全不同的跨域。2.可以实现双向通讯;</p>
+<p><strong>缺点</strong>：location.hash会直接暴露在URL里，并且在一些浏览器里会产生历史记录，数据安全性不高也影响用户体验。另外由于URL大小的限制，支持传递的数据量也不大。有些浏览器不支持hashchange事件，需要轮询来获知URL的变化。</p>
+<h6 id="window-name"><a href="#window-name" class="headerlink" title="window.name"></a>window.name</h6><p>window对象有个name属性，该属性有个特征：即在一个窗口(window)的生命周期内,窗口载入的所有的页面都是共享一个window.name的，每个页面对window.name都有读写的权限，window.name是持久存在一个窗口载入过的所有页面中的。window.name属性的神奇之处在于name 值在不同的页面（甚至不同域名）加载后依旧存在（如果没修改则值不会变化），并且可以支持非常长的 name 值（2MB）。</p>
+<p>跨域解决方案似乎可以呼之欲出了，假设a.com域下的a.html页面请求远端服务器的数据，我们在该页面下新建一个iframe标签，该iframe的src属性指向b.com/b.com（利用iframe标签的跨域能力)，b.com/b.html文件里设置好window.name的值（也就是该iframe的contentWindow的name值），然后在a.com/a.html里读取该iframe的window.name值，一切似乎水到渠成，代码如下：</p>
+<p>a.com/a.html：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">iframe = <span class="built_in">document</span>.createElement(<span class="string">'iframe'</span>),</span><br><span class="line">iframe.src = <span class="string">'http://b.com/b.html'</span>;</span><br><span class="line"><span class="built_in">document</span>.body.appendChild(iframe);</span><br><span class="line">iframe.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(iframe.contentWindow.name)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>b.com/b.html:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.name = <span class="string">"&#123;'key':'val'&#125;"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>然而实际使用的时候发现，会报错：Protocals, domains and ports must match. 所以还是跨域了……</p>
+<p>为什么会这样，因为如最开始所说，如果页面与iframe的src不同源，则无法取该框架的信息。于是我们想到，既然window.name有不变性，那么我们只要载入跨域src且设置window.name信息之后换个src去指定，问题也许迎刃而解？</p>
+<p>新建空白页面a.com/c.html，并且修改a.com/a.html:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">iframe = <span class="built_in">document</span>.createElement(<span class="string">'iframe'</span>),</span><br><span class="line">iframe.src = <span class="string">'b.com/b.html'</span>;</span><br><span class="line"><span class="built_in">document</span>.body.appendChild(iframe);</span><br><span class="line">iframe.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    iframe.src = <span class="string">'http://a.com/c.html'</span>;</span><br><span class="line">    <span class="built_in">console</span>.log(iframe.contentWindow.name)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>实际使用过程中，确实可以取到window.name的值，然而iframe的load事件绑定了修改src的方法，于是load事件就被持续触发了，aka 整个iframe不断的刷新……继续修改a.com/a.html的代码以期完美：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">iframe = <span class="built_in">document</span>.createElement(<span class="string">'iframe'</span>);</span><br><span class="line">iframe.style.display = <span class="string">'none'</span>;</span><br><span class="line"><span class="keyword">var</span> state = <span class="number">0</span>;</span><br><span class="line">     </span><br><span class="line">iframe.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(state === <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">var</span> data = <span class="built_in">JSON</span>.parse(iframe.contentWindow.name);</span><br><span class="line">        <span class="built_in">console</span>.log(data);</span><br><span class="line">        iframe.contentWindow.document.write(<span class="string">''</span>);</span><br><span class="line">        iframe.contentWindow.close();</span><br><span class="line">        <span class="built_in">document</span>.body.removeChild(iframe);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>(state === <span class="number">0</span>) &#123;</span><br><span class="line">        state = <span class="number">1</span>;</span><br><span class="line">        iframe.contentWindow.location = <span class="string">'http://a.com/c.html'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">iframe.src = <span class="string">'http://b.com/b.html'</span>;</span><br><span class="line"><span class="built_in">document</span>.body.appendChild(iframe);</span><br></pre></td></tr></table></figure></p>
+<h5 id="已经不复存在环境的方法——ie6的bug-window-navigator"><a href="#已经不复存在环境的方法——ie6的bug-window-navigator" class="headerlink" title="已经不复存在环境的方法——ie6的bug, window.navigator"></a>已经不复存在环境的方法——ie6的bug, window.navigator</h5><p>IE6的bug，父页面和子页面都可以访问window.navigator这个对象，在navigator上添加属性或方法可以共享。因为现在没有IE6环境，此处不再赘述。</p>
+<h3 id="正统流"><a href="#正统流" class="headerlink" title="正统流"></a>正统流</h3><p>原本为保证用户安全而引入的同源策略，却限制了开发人员本应有的跨域需求。cors和postMessage适时推出，一个从服务端一个从前端提出了各自的跨域请求解决思路。</p>
+<h4 id="CORS——跨域资源共享"><a href="#CORS——跨域资源共享" class="headerlink" title="CORS——跨域资源共享"></a>CORS——跨域资源共享</h4><p>CORS需要浏览器和服务器同时支持。目前，<em>所有浏览器都支持该功能，IE浏览器不能低于IE10</em>。</p>
+<p>因此，实现CORS通信的关键是服务器。只要服务器实现了CORS接口，就可以跨源通信。</p>
+<p>有了CORS，没有跨域通信能力的XHR及Fetch终于也可以跨域了。从前端实现来看，和同源ajax请求并无差别。</p>
+<p>跨域资源共享标准新增了一组 HTTP 首部字段，允许服务器声明哪些源站有权限访问哪些资源。另外，规范要求，对那些可能对服务器数据产生副作用的 HTTP 请求方法（特别是 GET 以外的 HTTP 请求，或者搭配某些 MIME 类型的 POST 请求），浏览器必须首先使用 OPTIONS 方法发起一个预检请求（preflight request），从而获知服务端是否允许该跨域请求。服务器确认允许之后，才发起实际的 HTTP 请求。在预检请求的返回中，服务器端也可以通知客户端，是否需要携带身份凭证（包括 Cookies 和 HTTP 认证相关数据）。</p>
+<p>接下来的内容将讨论相关场景，并剖析该机制所涉及的 HTTP 首部字段。</p>
+<p>这里，我们使用三个场景来解释跨域资源共享机制的工作原理。这些例子都使用 XMLHttpRequest 对象。</p>
+<h5 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h5><p><img src="http://p1.meituan.net/scarlett/5f58e31785e93c1fb612e3ea8a9be8c474880.jpg" alt="Simple Request"></p>
+<p>某些请求不会触发 CORS 预检请求。称之为“简单请求”，请注意，该术语并不属于 Fetch （其中定义了 CORS）规范。若请求满足所有下述条件，则该请求可视为“简单请求”：</p>
+<ul>
+<li>使用下列方法之一：<ol>
+<li>GET</li>
+<li>HEAD</li>
+<li>POST<ol>
+<li>Content-Type ：</li>
+<li>//注:仅当POST方法的Content-Type值等于下列之一才算作简单请求<ol>
+<li>text/plain</li>
+<li>multipart/form-data</li>
+<li>application/x-www-form-urlencoded</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Fetch 规范定义了对 CORS 安全的首部字段集合，不得人为设置该集合之外的其他首部字段。该集合为：<ol>
+<li>Accept</li>
+<li>Accept-Language</li>
+<li>Content-Language</li>
+<li>Content-Type （需要注意额外的限制）</li>
+<li>DPR</li>
+<li>Downlink</li>
+<li>Save-Data</li>
+<li>Viewport-Width</li>
+<li>Width </li>
+</ol>
+</li>
+</ul>
+<p>对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。</p>
+<p>下面是一个例子，浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /cors HTTP/1.1</span><br><span class="line">Origin: http://a.com</span><br><span class="line">Host: b.com</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
+<p>上面的头信息中，Origin字段用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。</p>
+<p>如果Origin指定的源，不在许可范围内，服务器会返回一个正常的HTTP回应。浏览器发现，这个回应的头信息没有包含Access-Control-Allow-Origin字段（详见下文），就知道出错了，从而抛出一个错误，被XMLHttpRequest的onerror回调函数捕获。注意，这种错误无法通过状态码识别，因为HTTP回应的状态码有可能是200。</p>
+<p>如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://a.com</span><br><span class="line">Access-Control-Allow-Credentials: true</span><br><span class="line">Access-Control-Expose-Headers: FooBar</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
+<p>上面的头信息之中，有三个与CORS请求相关的字段，都以 <strong>Access-Control-</strong> 开头:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段名</th>
+<th style="text-align:center">是否必须</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Access-Control-Allow-Origin</td>
+<td style="text-align:center">是</td>
+<td style="text-align:center">请求时Origin字段的值/*</td>
+<td style="text-align:left">接受特定来源的请求，*为任意来源</td>
+</tr>
+<tr>
+<td style="text-align:center">Access-Control-Allow-Credentials</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">布尔值</td>
+<td style="text-align:left">是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。</td>
+</tr>
+<tr>
+<td style="text-align:center">Access-Control-Expose-Headers</td>
+<td style="text-align:center">否</td>
+<td style="text-align:center">-</td>
+<td style="text-align:left">CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。</td>
+</tr>
+</tbody>
+</table>
+<p>由于CORS请求默认不发送Cookie和HTTP认证信息。如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Credentials: true</span><br></pre></td></tr></table></figure></p>
+<p>另一方面，开发者必须在AJAX请求中打开withCredentials属性。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</span><br><span class="line">xhr.withCredentials = <span class="literal">true</span>;</span><br></pre></td></tr></table></figure></p>
+<p>否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。</p>
+<p>但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。这时，开发者可以在请求中显式关闭withCredentials。</p>
+<p>需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传。</p>
+<h5 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h5><p><img src="http://p1.meituan.net/scarlett/74368f56cbc1acaf67375c5dbabb0cd2180206.jpg" alt="Preview Request"><br>与前述简单请求不同，“需预检的请求”要求必须首先使用 OPTIONS   方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。”预检请求“的使用，可以避免跨域请求对服务器的用户数据产生未预期的影响。</p>
+<p>当请求满足下述任一条件时，即应首先发送预检请求：</p>
+<ul>
+<li>使用了下面任一 HTTP 方法：<ol>
+<li>PUT</li>
+<li>DELETE</li>
+<li>CONNECT</li>
+<li>OPTIONS</li>
+<li>TRACE</li>
+<li>PATCH</li>
+</ol>
+</li>
+<li>人为设置了对 CORS 安全的首部字段集合之外的其他首部字段。该集合为：<ol>
+<li>Accept</li>
+<li>Accept-Language</li>
+<li>Content-Language</li>
+<li>Content-Type (but note the additional requirements below)</li>
+<li>DPR</li>
+<li>Downlink</li>
+<li>Save-Data</li>
+<li>Viewport-Width</li>
+<li>Width</li>
+</ol>
+</li>
+<li>Content-Type 的值不属于下列之一:<ol>
+<li>application/x-www-form-urlencoded</li>
+<li>multipart/form-data</li>
+<li>text/plain</li>
+</ol>
+</li>
+</ul>
+<p>浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP动词和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。</p>
+<p>下面是一个预检请求的HTTP头信息示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">OPTIONS /cors HTTP/1.1</span><br><span class="line">Origin: http://a.com</span><br><span class="line">Access-Control-Request-Method: PUT</span><br><span class="line">Access-Control-Request-Headers: X-Custom-Header</span><br><span class="line">Host: b.com</span><br><span class="line">Accept-Language: en-US</span><br><span class="line">Connection: keep-alive</span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure></p>
+<p>除了Origin字段，”预检”请求的头信息包括两个特殊字段:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字段名</th>
+<th style="text-align:center">是否必须</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Access-Control-Request-Method</td>
+<td style="text-align:center">是</td>
+<td style="text-align:left">列出浏览器的CORS请求会用到哪些HTTP方法</td>
+</tr>
+<tr>
+<td style="text-align:center">Access-Control-Request-Headers</td>
+<td style="text-align:center">否</td>
+<td style="text-align:left">该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段</td>
+</tr>
+</tbody>
+</table>
+<p>服务器收到”预检”请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Date: Mon, 01 Dec 2008 01:15:39 GMT</span><br><span class="line">Server: Apache/2.0.61 (Unix)</span><br><span class="line">Access-Control-Allow-Origin: http://a.com</span><br><span class="line">Access-Control-Allow-Methods: GET, POST, PUT</span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Content-Encoding: gzip</span><br><span class="line">Content-Length: 0</span><br><span class="line">Keep-Alive: timeout=2, max=100</span><br><span class="line">Connection: Keep-Alive</span><br><span class="line">Content-Type: text/plain</span><br></pre></td></tr></table></figure></p>
+<p>而如果服务器否定了”预检”请求，会返回一个正常的HTTP回应，但是没有任何CORS相关的头信息字段。这时，浏览器就会认定，服务器不同意预检请求，因此触发一个错误，被XMLHttpRequest对象的onerror回调函数捕获。报错信息如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">XMLHttpRequest cannot load http://b.com.</span><br><span class="line">Origin http://api.bob.com is not allowed by Access-Control-Allow-Origin.</span><br></pre></td></tr></table></figure></p>
+<p>一旦服务器通过了”预检”请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。</p>
+<p>CORS与JSONP的使用目的相同，但是比JSONP更强大。</p>
+<p><strong>优点</strong>：JSONP只支持GET请求，CORS支持所有类型的HTTP请求。</p>
+<p><strong>缺点</strong>：JSONP的优势在于支持老式浏览器，以及可以向不支持CORS的网站请求数据。</p>
+<h4 id="postMessage——跨文档通信"><a href="#postMessage——跨文档通信" class="headerlink" title="postMessage——跨文档通信"></a>postMessage——跨文档通信</h4><p>在hack流中我们了解到，iframe的src如果和父页面不同源，那么父页面将取不到该框架的信息。HTML5为了解决这个问题，引入了一个全新的API：跨文档通信 API（Cross-document messaging）。这个API为window对象新增了一个window.postMessage方法，允许跨窗口通信，不论这两个窗口是否同源。Internet Explorer 8+, chrome，Firefox , Opera 和 Safari 都支持这个功能。但是Internet Explorer 8和9以及Firefox 6.0和更低版本仅支持字符串作为postMessage的消息。</p>
+<p>postMessage方法的第一个参数是具体的信息内容，第二个参数是接收消息的窗口的源（origin），即”协议 + 域名 + 端口”。也可以设为*，表示不限制域名，向所有窗口发送。</p>
+<p>父窗口和子窗口都可以通过message事件，监听对方的消息。message事件的事件对象event，提供以下三个属性：</p>
+<ol>
+<li>event.source: 发送消息的窗口;</li>
+<li>event.origin: 消息发向的网址;</li>
+<li>event.data: 消息内容.</li>
+</ol>
+<p>一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> onmessage = <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123; </span><br><span class="line">  <span class="keyword">var</span> data = event.data;<span class="comment">//消息 </span></span><br><span class="line">  <span class="keyword">var</span> origin = event.origin;<span class="comment">//消息来源地址 </span></span><br><span class="line">  <span class="keyword">var</span> source = event.source;<span class="comment">//源Window对象 </span></span><br><span class="line">  <span class="keyword">if</span>(origin == <span class="string">"http://www.aaa.com"</span>)&#123; </span><br><span class="line">   <span class="built_in">console</span>.log(data);<span class="comment">//hello world! </span></span><br><span class="line">  &#125; </span><br><span class="line">   source.postMessage(<span class="string">'Nice to see you!'</span>, <span class="string">'*'</span>);</span><br><span class="line">&#125;; </span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.addEventListener != <span class="string">'undefined'</span>) &#123; </span><br><span class="line">  <span class="built_in">window</span>.addEventListener(<span class="string">'message'</span>, onmessage, <span class="literal">false</span>); </span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">window</span>.attachEvent != <span class="string">'undefined'</span>) &#123; </span><br><span class="line">  <span class="comment">//ie </span></span><br><span class="line">  <span class="built_in">window</span>.attachEvent(<span class="string">'onmessage'</span>, onmessage); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><h5 id="时代眼泪——XDomainRequest"><a href="#时代眼泪——XDomainRequest" class="headerlink" title="时代眼泪——XDomainRequest"></a>时代眼泪——XDomainRequest</h5><p>XDomainRequest是在IE8和IE9上的HTTP access control (CORS) 的实现，在IE10中被 包含CORS的XMLHttpRequest 取代了,该接口可以发送GET和POST请求。</p>
+<p><strong>语法</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> xdr = <span class="keyword">new</span> XDomainRequest();</span><br></pre></td></tr></table></figure></p>
+<p>返回XDomainRequest的实例，该实例可以被用来生成或管理请求。</p>
+<p><strong>XDomainRequest对象构成</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">构成</th>
+<th style="text-align:center">名称</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">属性</td>
+<td style="text-align:center">timeout</td>
+<td style="text-align:left">获取或设置请求的过期时间</td>
+</tr>
+<tr>
+<td style="text-align:center">&nbsp;</td>
+<td style="text-align:center">responseText</td>
+<td style="text-align:left">以字符串形式获取响应体</td>
+</tr>
+<tr>
+<td style="text-align:center">方法</td>
+<td style="text-align:center">open()</td>
+<td style="text-align:left">根据指定的方法（GET或POST）和URL, 打开请求</td>
+</tr>
+<tr>
+<td style="text-align:center">&nbsp;</td>
+<td style="text-align:center">send()</td>
+<td style="text-align:left">发送请求, POST的数据会在该方法中被指定</td>
+</tr>
+<tr>
+<td style="text-align:center">&nbsp;</td>
+<td style="text-align:center">abort()</td>
+<td style="text-align:left">中止请求</td>
+</tr>
+<tr>
+<td style="text-align:center">事件处理程序</td>
+<td style="text-align:center">onprogress</td>
+<td style="text-align:left">当请求中发送方法和onload事件中有进展时的处理程序</td>
+</tr>
+<tr>
+<td style="text-align:center">&nbsp;</td>
+<td style="text-align:center">ontimeout</td>
+<td style="text-align:left">当请求超时时的事件处理程序</td>
+</tr>
+<tr>
+<td style="text-align:center">&nbsp;</td>
+<td style="text-align:center">onerror</td>
+<td style="text-align:left">当请求发生错误时的处理程序</td>
+</tr>
+<tr>
+<td style="text-align:center">&nbsp;</td>
+<td style="text-align:center">onload</td>
+<td style="text-align:left">当服务器端的响应被完整接收时的处理程序</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例子</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="built_in">window</span>.XDomainRequest)&#123;</span><br><span class="line">  <span class="keyword">var</span> xdr = <span class="keyword">new</span> XDomainRequest();</span><br><span class="line"> </span><br><span class="line">  xdr.open(<span class="string">"get"</span>, <span class="string">"http://example.com/api/method"</span>);</span><br><span class="line"> </span><br><span class="line">  xdr.onprogress = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//Progress</span></span><br><span class="line">  &#125;;</span><br><span class="line"> </span><br><span class="line">  xdr.ontimeout = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//Timeout</span></span><br><span class="line">  &#125;;</span><br><span class="line"> </span><br><span class="line">  xdr.onerror = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//Error Occured</span></span><br><span class="line">  &#125;;</span><br><span class="line"> </span><br><span class="line">  xdr.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//success(xdr.responseText);</span></span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line">  setTimeout(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    xdr.send();</span><br><span class="line">  &#125;, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>安全</strong></p>
+<p>XDomainRequest为了确保安全构建，采用了多种方法。</p>
+<ul>
+<li>安全协议源必须匹配请求的URL。（http到http，https到https）。如果不匹配，请求会报“拒绝访问”的错误。</li>
+<li>被请求的URL的服务器必须带有 设置为（“*”）或包含了请求方的Access-Control-Allow-Origin的头部。</li>
+</ul>
+<h5 id="开发专用——nginx反向代理"><a href="#开发专用——nginx反向代理" class="headerlink" title="开发专用——nginx反向代理"></a>开发专用——nginx反向代理</h5><p>nginx反向代理的一个典型应用是均衡负载，然而其特性让我们在开发的时候可以方便的进行跨域设置。开发过程中一个典型的场景是，api已经上线，但是并没有设置cors，或者小作坊开发的时候，api服务在别人的电脑上也是开发状态，均不允许跨域调用。我们的应用上线之后发起的请求是同源的，然而在开发的时候是跨域的，apparently。这个时候也可以设置nginx反向代理实现跨域请求。</p>
+<p>如果我们在<code>a.com/a.html里ajax请求b.com/b?param=1</code>,  必然会遇到跨域问题，如果我们打开nginx.conf配置文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server&#123;</span><br><span class="line">  listen 8000;</span><br><span class="line">  location / &#123;</span><br><span class="line">    root html;</span><br><span class="line">    index index.html index.htm;</span><br><span class="line">  &#125;</span><br><span class="line">  location /b &#123;</span><br><span class="line">    rewrite ^/b/?$ /$1 break;</span><br><span class="line">    includeuwsgi_params;</span><br><span class="line">    proxy_pass http://b.com/b</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><h2 id="Extra"><a href="#Extra" class="headerlink" title="Extra"></a>Extra</h2><h3 id="CSP——内容安全策略"><a href="#CSP——内容安全策略" class="headerlink" title="CSP——内容安全策略"></a>CSP——内容安全策略</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/Javascript/" rel="tag"># Javascript</a>
+          
+            <a href="/notes/tags/跨域/" rel="tag"># 跨域</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2016/01/28/memory-leak/" rel="next" title="JavaScript垃圾回收与内存泄漏">
+                <i class="fa fa-chevron-left"></i> JavaScript垃圾回收与内存泄漏
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2016/11/28/webpack/" rel="prev" title="Webpack入门">
+                Webpack入门 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是跨域"><span class="nav-number">1.</span> <span class="nav-text">什么是跨域</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#跨域访问的解决方案"><span class="nav-number">2.</span> <span class="nav-text">跨域访问的解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分类"><span class="nav-number">2.1.</span> <span class="nav-text">分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hack流"><span class="nav-number">2.1.1.</span> <span class="nav-text">Hack流</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IMG-Ping——利用图片的跨域特性"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">IMG Ping——利用图片的跨域特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JSONP——利用script标签的跨域特性"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">JSONP——利用script标签的跨域特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#iframe实现跨域通信"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">iframe实现跨域通信</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#端口协议主域相同、子域不同"><span class="nav-number">2.1.1.3.1.</span> <span class="nav-text">端口协议主域相同、子域不同</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#子域也不同"><span class="nav-number">2.1.1.3.2.</span> <span class="nav-text">子域也不同</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#location-hash"><span class="nav-number">2.1.1.3.2.1.</span> <span class="nav-text">location.hash</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#window-name"><span class="nav-number">2.1.1.3.2.2.</span> <span class="nav-text">window.name</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#已经不复存在环境的方法——ie6的bug-window-navigator"><span class="nav-number">2.1.1.3.3.</span> <span class="nav-text">已经不复存在环境的方法——ie6的bug, window.navigator</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正统流"><span class="nav-number">2.1.2.</span> <span class="nav-text">正统流</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CORS——跨域资源共享"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">CORS——跨域资源共享</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#简单请求"><span class="nav-number">2.1.2.1.1.</span> <span class="nav-text">简单请求</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#预检请求"><span class="nav-number">2.1.2.1.2.</span> <span class="nav-text">预检请求</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#postMessage——跨文档通信"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">postMessage——跨文档通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#时代眼泪——XDomainRequest"><span class="nav-number">2.1.2.3.1.</span> <span class="nav-text">时代眼泪——XDomainRequest</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#开发专用——nginx反向代理"><span class="nav-number">2.1.2.3.2.</span> <span class="nav-text">开发专用——nginx反向代理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.1.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Extra"><span class="nav-number">2.2.</span> <span class="nav-text">Extra</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CSP——内容安全策略"><span class="nav-number">2.2.1.</span> <span class="nav-text">CSP——内容安全策略</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

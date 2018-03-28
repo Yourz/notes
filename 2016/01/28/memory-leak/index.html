@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,Javascript,内存,垃圾回收,优化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="#前言我们都知道JavaScript是自动进行内存回收的，在平常的开发中，我们也一般不会去关注内存问题。那么是否就意味着我们就不需要了解Js的内存回收了呢？当然不是， 就像Java的内存回收一样，自动内存回收固然大大简化了开发者的工作，但算法策略并不是完美的，总会有各种特殊的情况导致内存无法正常回收。 #1 概念 ##1.1 JavaScript数据类型JavaScript的数据类型有：Strin">
+<meta name="keywords" content="前端,Javascript,内存,垃圾回收,优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript垃圾回收与内存泄漏">
+<meta property="og:url" content="https://yourz.github.io/notes/2016/01/28/memory-leak/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="#前言我们都知道JavaScript是自动进行内存回收的，在平常的开发中，我们也一般不会去关注内存问题。那么是否就意味着我们就不需要了解Js的内存回收了呢？当然不是， 就像Java的内存回收一样，自动内存回收固然大大简化了开发者的工作，但算法策略并不是完美的，总会有各种特殊的情况导致内存无法正常回收。 #1 概念 ##1.1 JavaScript数据类型JavaScript的数据类型有：Strin">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yourz.github.io/notes/images/memory-leak/23.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/memory-leak/24.png">
+<meta property="og:updated_time" content="2018-03-28T13:00:03.760Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript垃圾回收与内存泄漏">
+<meta name="twitter:description" content="#前言我们都知道JavaScript是自动进行内存回收的，在平常的开发中，我们也一般不会去关注内存问题。那么是否就意味着我们就不需要了解Js的内存回收了呢？当然不是， 就像Java的内存回收一样，自动内存回收固然大大简化了开发者的工作，但算法策略并不是完美的，总会有各种特殊的情况导致内存无法正常回收。 #1 概念 ##1.1 JavaScript数据类型JavaScript的数据类型有：Strin">
+<meta name="twitter:image" content="https://yourz.github.io/notes/images/memory-leak/23.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2016/01/28/memory-leak/"/>
+
+
+
+
+
+  <title>JavaScript垃圾回收与内存泄漏 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2016/01/28/memory-leak/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JavaScript垃圾回收与内存泄漏</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-28T19:50:53+08:00">
+                2016-01-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/基础总结/" itemprop="url" rel="index">
+                    <span itemprop="name">基础总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>#前言<br>我们都知道JavaScript是自动进行内存回收的，在平常的开发中，我们也一般不会去关注内存问题。那么是否就意味着我们就不需要了解Js的内存回收了呢？<br>当然不是， 就像Java的内存回收一样，自动内存回收固然大大简化了开发者的工作，但算法策略并不是完美的，总会有各种特殊的情况导致内存无法正常回收。</p>
+<p>#1 概念</p>
+<p>##1.1 JavaScript数据类型<br>JavaScript的数据类型有：String、Number、Boolean、Array、Object、Null、Undefined。其中String、Number、Boolean、Null、Undefined属于基本类型，Array和Object属于引用类型。</p>
+<p>##1.2 栈和堆<br>栈是操作系统使用的一种功能，它有大小限制，操作不灵活，它由系统自动分配和释放；而堆是编程语言提供的一种功能，是动态分配的内存，大小不定也不会由系统自动释放。其中：</p>
+<ul>
+<li>基本类型是存放在栈内存中的简单数据段，分为变量标识和值，均保存在栈内存，变量标识指向其对应的值，数据大小确定，内存空间大小可以分配。 </li>
+<li>引用类型是存放在堆内存中的对象，变量实际保存的是一个指针，这个指针指向另一个位置。每个空间大小不一样，要根据情况开进行特定的分配。</li>
+</ul>
+<p>当我们需要访问引用类型（如对象，数组）的值时，首先从栈中获得该对象的地址指针，然后再从堆内存中取得所需的数据。而我们提到的内存泄漏的情况只会发生在堆内存中（从概念可得知）。但是栈和堆都会发生内存溢出。</p>
+<p>##1.3 内存泄漏与内存溢出<br>提到内存泄漏，我们平常还经常听到另一个名词内存溢出。其实这两个名词所代表的含义大不相同：</p>
+<p><strong>内存泄漏（Memory Leak）</strong></p>
+<p>内存泄漏指由于疏忽或错误造成程序未能释放已经不再使用的内存。程序员认为合理的代码，但实际运行时，随着处理操作或请求，内存会不断上升直到超出程序设置的最大内存，导致程序奔溃。对于有垃圾回收机制的平台，到了接近内存溢出阶段，由于GC算法会不断尝试内存回收，系统的CPU会急剧提升。内存泄漏的问题，对后端服务或者游戏等长时间运行的程序影响比较大。对于存活时间较短的普通客户端危害较低，但是在SPA应用中内存泄漏的危害会被放大。</p>
+<p><strong>内存溢出（out of memory）</strong></p>
+<p>是指程序在申请内存时，没有足够的内存空间供其使用，出现out of memory。比方说栈，栈满时再做进栈必定产生空间溢出，叫上溢，栈空时再做退栈也产生空间溢出，称为下溢。就是分配的内存不足以放下数据项序列，称为内存溢出。内存溢出不一定是由内存泄漏引发的，也可能是程序本身申请的内存就不够。</p>
+<p>以发生的方式来分类，内存泄漏可以分为4类：</p>
+<ul>
+<li>常发性内存泄漏。发生内存泄漏的代码会被多次执行到，每次被执行的时候都会导致一块内存泄漏。 </li>
+<li>偶发性内存泄漏。发生内存泄漏的代码只有在某些特定环境或操作过程下才会发生。常发性和偶发性是相对的。对于特定的环境，偶发性的也许就变成了常发性的。所以测试环境和测试方法对检测内存泄漏至关重要。</li>
+<li>一次性内存泄漏。发生内存泄漏的代码只会被执行一次，或者由于算法上的缺陷，导致总会有一块仅且一块内存发生泄漏。</li>
+<li>隐式内存泄漏。程序在运行过程中不停的分配内存，但是直到结束的时候才释放内存。严格的说这里并没有发生内存泄漏，因为最终程序释放了所有申请的内存。但是对于一个服务器程序，需要运行几天，几周甚至几个月，不及时释放内存也可能导致最终耗尽系统的所有内存。所以，我们称这类内存泄漏为隐式内存泄漏。 </li>
+</ul>
+<p>从用户使用程序的角度来看，内存泄漏本身不会产生什么危害，作为一般的用户，根本感觉不到内存泄漏的存在。真正有危害的是内存泄漏的堆积，这会最终消耗尽系统所有的内存，最终引发内存溢出。从这个角度来说，一次性内存泄漏并没有什么危害，因为它不会堆积，而隐式内存泄漏危害性则非常大，因为较之于常发性和偶发性内存泄漏它更难被检测到。</p>
+<p>##1.4 垃圾回收<br>在计算机科学中，垃圾回收（英语：Garbage Collection，缩写为GC）是一种自动的内存管理机制。当一块动态内存不再需要时，就应该予以释放以让出内存，这种内存资源管理，称为垃圾回收（garbage collection）。垃圾回收器可以让程序员减轻许多负担，也减少程序员犯错的机会。垃圾回收最早起源于LISP语言。目前许多语言如Java、C#和JavaScript都支持垃圾回收器。<br>垃圾回收器有两个基本的原理：</p>
+<ul>
+<li>考虑某个对象在未来的程序运行中，将不会被访问。</li>
+<li>向这些对象要求归回内存。<br>#2 JavaScript的内存回收机制<br>Javascript在分配内存这一过程中，会根据不同的数据类型进行分配。像基本数据类型会分配在栈内存，引用数据类型分配在堆内存中。<br>我们平时在使用定义变量，函数或者对象的时候，都在进行各种的内存分配，但是通常不需要写代码去回收，因为我们知道它是自动回收的。Js的内存回收算法有哪些呢？<br>##2.1 引用计数<br>是指将资源的被引用次数保存起来，当被引用次数变为零时就将其释放的过程。使用引用计数技术可以实现自动资源管理的目的。同时引用计数还可以指使用引用计数技术回收未使用资源的垃圾回收算法。<br>当创建一个对象的实例并在堆上申请内存时，对象的引用计数就为1，在其他对象中需要持有这个对象时，就需要把该对象的引用计数加1，需要释放一个对象时，就将该对象的引用计数减1，直至对象的引用计数为0，对象的内存会被立刻释放。<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//引用计数示例：</span></span><br><span class="line"><span class="keyword">var</span> a = &#123;&#125;;     <span class="comment">//对象&#123;&#125;的引用计数为1</span></span><br><span class="line">b = a;          <span class="comment">//对象&#123;&#125;的引用计数为1+1</span></span><br><span class="line">a = <span class="literal">null</span>;       <span class="comment">//对象&#123;&#125;的引用计数为2-1，所以此时对象&#123;&#125;不会被回收;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>循环引用导致内存不能正常被回收。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 函数a执行完后，本来x， y对象都应该在垃圾回收阶段被回收， 可是由于存在循环引用，也不能被回收。</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> x = &#123; &#125;;</span><br><span class="line">    <span class="keyword">var</span> y = &#123;&#125;;</span><br><span class="line">    x.a = y;</span><br><span class="line">    y.a = x;</span><br><span class="line">&#125;</span><br><span class="line">a();</span><br></pre></td></tr></table></figure></p>
+<p>IE 6， 7 对DOM对象进行引用计数回收，这样简单的垃圾回收机制，非常容易出现循环引用问题导致内存不能被回收， 进行导致内存泄露等问题。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">//IE 6， 7中下列代码会导致btn不能被回收</span></span><br><span class="line">    <span class="keyword">var</span> btn = <span class="built_in">document</span>.getElementsByTagName(<span class="string">'button'</span>);</span><br><span class="line">    btn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(btn);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;();</span><br></pre></td></tr></table></figure></p>
+<p>##2.2 标记清除</p>
+<p><strong>目前主流浏览器均产用此内存回收机制。</strong></p>
+<p>标记清除的方式需要对程序的对象进行两次扫描，第一次从根（Root）开始扫描，被根引用了的对象标记为不是垃圾，不是垃圾的对象引用的对象同样标记为不是垃圾，以此递归。所有不是垃圾的对象的引用都扫描完了之后。就进行第二次扫描，第一次扫描中没有得到标记的对象就是垃圾了，对此进行回收。<strong>也就是它从之前判断”对象是否被需要”变成”对象是否可以获得”。这么理解，零引用的对象总是不可获得的，但是不可能获得的对象不一定零引用。</strong></p>
+<p><img src="/notes/images/memory-leak/23.png" alt="test03"></p>
+<p>比如定义一个变量，那么当它进入执行环境时，会被垃圾回收器标记为”进入环境”，当其离开环境比如函数执行完毕的时候，标记为”离开环境”。垃圾回收机器就会在这些”离开环境”的变量中挑选出来需要回收掉的变量用于释放内存。</p>
+<p>##2.3 两种算法的优缺点<br>算法 | 优点 | 缺点<br>    —|—|—<br>    引用计数 | 1.尽快地回收不再被使用的对象<br>2.在回收过程中不会导致长时间的停顿<br>3.可以清晰地标明每一个对象的生存周期 | 1.频繁更新引用计数会降低运行效率<br>2.原始的引用计数无法解决循环引用问题<br>    标记清除 | 1.没有更新引用的操作<br>2.不存在循环引用导致无法回收的问题 | 1.在内存即将耗尽时，会频繁的触发内存回收操作，导致性能急剧下降</p>
+<p>#3 JavaScript中的内存泄漏<br>引起垃圾收集语言内存泄露的主要原因是不必要的引用。不必要的引用就是那些程序员知道这块内存已经没用了，但是出于某种原因这块内存依然存在于活跃的根节点发出的节点树中。在 Javascript 的环境中，不必要的引用是某些不再被使用的代码中的变量，这些变量指向了一块本来可以被释放的内存。一些人认为这是程序员的失误。</p>
+<p><strong>现代垃圾收集器使用不同的方式来改进标记清除算法，但是它们都有相同的本质：可以访问的内存块被标记为非垃圾而其余的就被视为垃圾。</strong></p>
+<p>那么什么情况下会产生不必要的引用呢？</p>
+<p>##3.1 意外的全局变量<br>Javascript 语言的设计目标之一是开发一种类似于 Java 但是对初学者十分友好的语言。体现 JavaScript 宽容性的一点表现在它处理未声明变量的方式上：一个未声明变量的引用会在全局对象中创建一个新的变量。在浏览器的环境下，全局对象就是 window，也就是说：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//意外的全局变量：</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">    bar = &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 实际上是：</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">arg</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">window</span>.bar = &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意上面提到的意外，如果 bar 是一个应该指向 foo 函数作用域内变量的引用，但是你忘记使用 var 来声明这个变量，这时一个全局变量就会被创建出来。在这个例子中，一个空的对象泄露并不会造成很大的危害，但这无疑是错误的。<br>下面的例子中其实也会意外的创建一个全局变量：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//另外一种偶然创建全局变量的方式：</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.bar = &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//此时执行foo函数，this其实是指代window</span></span><br><span class="line">foo();</span><br></pre></td></tr></table></figure></p>
+<p>为了防止这种错误的发生，可以在你的 JavaScript 文件开头添加 ‘use strict’; 语句。这个语句实际上开启了解释 JavaScript 代码的严格模式，这种模式可以避免创建意外的全局变量。</p>
+<p><strong>注意事项：</strong></p>
+<p>尽管我们在讨论那些隐蔽的全局变量，但是也有很多代码被明确的全局变量污染的情况。按照定义来讲，这些都是不会被回收的变量（除非设置 null 或者被重新赋值）。</p>
+<p>特别需要注意的是那些被用来临时存储和处理一些大量的信息的全局变量。如果你必须使用全局变量来存储很多的数据，请确保在使用过后将它设置为 null 或者将它重新赋值。常见的和全局变量相关的引发内存消耗增长的原因就是缓存。缓存存储着可复用的数据。为了让这种做法更高效，必须为缓存的容量规定一个上界。由于缓存不能被及时回收的缘故，缓存无限制地增长会导致很高的内存消耗。</p>
+<p>##3.2 没有及时清除的定时器和回调函数<br>在 JavaScript 中 setInterval 的使用十分常见。其他的库也经常会提供观察者和其他需要回调的功能。这些库中的绝大部分都会关注一点，就是当它们本身的实例被销毁之前销毁所有指向回调的引用。而目前主流浏览器都能很好的处理在被绑定的元素被移除后的回调函数。而setInterval则需要我们手动清除。<br>在 setInterval 这种情况下，一般情况下的代码是这样的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//常见的定时器写法：</span></span><br><span class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> node = <span class="built_in">document</span>.getElementById(<span class="string">'search'</span>);</span><br><span class="line">    setInterval(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(node);</span><br><span class="line">        <span class="keyword">if</span>(node) &#123;</span><br><span class="line">            node.innerHTML = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;， <span class="number">1000</span>);</span><br><span class="line">    <span class="comment">//移除node节点</span></span><br><span class="line">    node.remove();</span><br><span class="line">&#125;();</span><br></pre></td></tr></table></figure></p>
+<p>这个例子说明了定时器会发生什么：整个定时器是在一个立即执行函数中，当node节点从dom中移除后，整个定时器已经没有运行存在的必要了。然而，由于周期函数一直在运行，处理函数并不会被回收（只有周期函数停止运行之后才开始回收内存）。如果周期处理函数不能被回收，那么此函数的执行上下文相关的资源就不能被回收，例如node，进而导致root节点会一直保留在内存中（虽然dom中看不到了），甚至我们还可以看到node的innerHTML仍然在被修改，直到定时器被清除。</p>
+<p>下面举一个观察者的例子，当它们不再被需要的时候（或者关联对象将要失效的时候）显式地将他们移除是十分重要的。在以前，尤其是对于某些浏览器（IE6、IE7）是一个至关重要的步骤，因为它们在管理dom对象的时候还是产用的引用计数的回收算法，不能很好地管理循环引用。现在，当观察者对象失效的时候便会被回收，即便 listener 没有被明确地移除，绝大多数的浏览器可以或者将会支持这个特性。尽管如此，在对象被销毁之前移除观察者依然是一个好的实践。示例如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> element = <span class="built_in">document</span>.getElementById(<span class="string">'button'</span>);</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">onClick</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">        element.innerHtml = <span class="string">'text'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    element.addEventListener(<span class="string">'click'</span>， onClick);</span><br><span class="line">    <span class="comment">//在IE6、IE7浏览器上，移除node之前需要手动的removeEventListener，这样才能保证element被正常回收（其实就是循环引用）</span></span><br><span class="line">    element.removeEventListener(<span class="string">'click'</span>， onClick);</span><br><span class="line">    element.parentNode.removeChild(element);</span><br><span class="line">&#125;();</span><br></pre></td></tr></table></figure></p>
+<p>##3.3 DOM之外的引用<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//DOM之外的引用：</span></span><br><span class="line"><span class="keyword">var</span> node = <span class="built_in">document</span>.getElementById(<span class="string">'search'</span>);</span><br><span class="line">node.remove();</span><br><span class="line"><span class="built_in">console</span>.log(node);</span><br></pre></td></tr></table></figure></p>
+<p>此时该节点被全局变量node引用，导致其即使从dom中移除后，也不会从内存中回收。<br>还需要注意的是，就是对 DOM 树父节点的引用问题。<br>假设有两个父子关系的div，会发生什么呢?<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"root"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"son"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> node = <span class="built_in">document</span>.getElementById(<span class="string">'son'</span>);</span><br><span class="line">node.parentNode.remove(); <span class="comment">//移除父节点</span></span><br><span class="line"><span class="built_in">console</span>.log(node.parentNode); <span class="comment">//app可访问</span></span><br><span class="line"><span class="built_in">console</span>.log(node.parentNode.parentNode); <span class="comment">//null</span></span><br></pre></td></tr></table></figure>
+<p>在上面的例子中，我们从DOM中移除了id为app的这个div，但是因为son被node这个全局变量引用着，导致app作为一个分离的DOM树整体（Detached DOM tree）并没有真正从内存中回收掉。所以当你想要保留 DOM 元素的引用时，要仔细的考虑清楚这一点。</p>
+<p>##3.4 错误的使用闭包<br>JavaScript 开发中一个重要的内容就是闭包，而到底什么是闭包，到现在业内仍然是众说纷纭，有的人说这种格式叫做闭包，有的人说是可以获取父级作用域的函数。我个人赞成后者。有一种说法是：闭包会导致内存泄漏，那么这种说法对不对呢？首先看下面的一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> replaceThing = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">//为了方便观察内存情况（正常情况下一般是不会有这么长的数组的），new一个有一亿项元素的数组，这样数组本身会占用很大的内存</span></span><br><span class="line">      <span class="keyword">var</span> originalThing = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">100000000</span>).join(<span class="string">'*'</span>);</span><br><span class="line">      <span class="keyword">var</span> outer = <span class="string">'outer str'</span>;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'new...'</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (originalThing)</span><br><span class="line">          <span class="built_in">console</span>.log(outer);</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line"><span class="comment">//得到闭包函数</span></span><br><span class="line"><span class="keyword">var</span> closureFn = replaceThing();</span><br><span class="line"><span class="comment">//执行</span></span><br><span class="line">closureFn();</span><br></pre></td></tr></table></figure></p>
+<p>我们发现，内存占用明显增加了。我们把上面的代码稍加修改，重新执行下看下效果。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> replaceThing = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">//为了方便观察内存情况，new一个有一亿项元素的数组，这样数组本身会占用很大的内存</span></span><br><span class="line">      <span class="keyword">var</span> originalThing = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">100000000</span>).join(<span class="string">'*'</span>);</span><br><span class="line">      <span class="keyword">var</span> outer = <span class="string">'outer str'</span>;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'new...'</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (originalThing)</span><br><span class="line">          <span class="built_in">console</span>.log(outer);</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line"><span class="comment">//得到闭包函数并执行</span></span><br><span class="line">replaceThing()();</span><br></pre></td></tr></table></figure></p>
+<p>测试发现，当代码执行完后，内存没有明显增加，也就是说闭包之所以会一起内存泄漏，是因为我们在使用的时候，错误的将闭包函数赋值给了一个全局变量，这样就会导致闭包及闭包作用域的变量不会被回收。<br>为了验证我们的想法，接下来我们创建多个闭包并执行看效果。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> replaceThing = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">//为了方便观察内存情况，new一个有一亿项元素的数组，这样数组本身会占用很大的内存</span></span><br><span class="line">      <span class="keyword">var</span> originalThing = <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">100000000</span>).join(<span class="string">'*'</span>);</span><br><span class="line">      <span class="keyword">var</span> outer = <span class="string">'outer str'</span>;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'new...'</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (originalThing)</span><br><span class="line">          <span class="built_in">console</span>.log(outer);</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">//得到闭包函数并执行</span></span><br><span class="line">    replaceThing()();</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//每1秒执行一次，看内存变化</span></span><br><span class="line">setInterval(test， <span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>测试结果是内存并没有明显增加，一直稳定在某个区间，再次验证我们的想法，也就是说闭包本身并不会引起内存泄漏。<br>有一种特殊情况下有可能会以一种很微妙的方式产生内存泄漏，这实际上是 js 引擎的 bug ， ECMA 规范不会造成这种内存泄露。这取决于JavaScript 的实现细节，这个 bug 在 Google Chrome / Node.js / Apple Safari / Mozilla Firefox 上都有。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> theThing = <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">var</span> replaceThing = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> originalThing = theThing;</span><br><span class="line">  <span class="keyword">var</span> unused = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (originalThing)</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'hi'</span>);</span><br><span class="line">  &#125;;</span><br><span class="line">  theThing = &#123;</span><br><span class="line">    <span class="comment">//为了方便观察内存情况，创建了一个很大的字符串，这样数组本身会占用很大的内存</span></span><br><span class="line">    longStr: <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">100000000</span>).join(<span class="string">'*'</span>)，</span><br><span class="line">    someMethod: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'123'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//每1秒执行一次，看内存变化</span></span><br><span class="line">setInterval(replaceThing， <span class="number">1000</span>);</span><br></pre></td></tr></table></figure></p>
+<p>以上代码执行，发生的内存泄漏问题，无法直观的看出来，但是我们可以通过Chrome开发者工具使用memory生成内存快照观察到。通过Chrome的内存快照功能可以明显看到内存在增加。等待数秒会发现Chrome报内存溢出了。并且当我们手动的清除掉定时器时，内存并没有被回收掉。<br>接下来，我试着用我的理解，解释上面的代码之所以会发生内存泄漏的原因。</p>
+<p><img src="/notes/images/memory-leak/24.png" alt="test04"></p>
+<p><strong>首先科普下：在执行函数的时候，如果遇到闭包，会创建闭包作用域内存空间，将该闭包所用到的局部变量添加进去，然后再遇到闭包，会在之前创建好的作用域空间添加此闭包会用到而前闭包没用到的变量。也就是说同一个父级作用域的多个闭包是共享一个闭包作用域的。</strong></p>
+<p>我们以执行了三次为例，第一次执行为xx1，以此类推，</p>
+<ul>
+<li>首先上面的代码中存在两个闭包，一个是unused，另一个是someMethod。</li>
+<li>再加上theThing处于replaceThing的运行时上下文环境中，theThing3要保证随时可以让replaceThing可以访问，所以theThing3不会被回收。</li>
+<li>进而someMethod3不会被回收。</li>
+<li>进而导致闭包作用域内的变量不会被回收。</li>
+<li>进而导致闭包作用域中闭包unused3的上下文参数theThing2没有被回收。</li>
+<li>theThing2中的someMethod2又会导致unused2不会被回收。</li>
+<li>以此类推，所有 的theThing内存对象都不能被释放。</li>
+</ul>
+<p>简而言之，就是发生内存泄漏的原因就在于因为共享闭包作用域的原因，多个闭包作用域形成了链式的依赖，导致所有的theThing内存对象都得不到释放。</p>
+<p><strong>为什么说错误的使用闭包会导致内存泄漏呢？</strong></p>
+<p>我们把上面的例子简单的修改一下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">!<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> theThing = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">var</span> replaceThing = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> originalThing = theThing;</span><br><span class="line">      <span class="keyword">var</span> unused = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (originalThing)</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'hi'</span>);</span><br><span class="line">      &#125;;</span><br><span class="line">      theThing = &#123;</span><br><span class="line">        <span class="comment">//为了方便观察内存情况，创建了一个很大的字符串，这样数组本身会占用很大的内存</span></span><br><span class="line">        longStr: <span class="keyword">new</span> <span class="built_in">Array</span>(<span class="number">100000000</span>).join(<span class="string">'*'</span>)，</span><br><span class="line">        someMethod: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="built_in">console</span>.log(<span class="string">'123'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">//每1秒执行一次，看内存变化，我们将定时器的ID打印出来</span></span><br><span class="line">    <span class="built_in">console</span>.log(setInterval(replaceThing， <span class="number">1000</span>));</span><br><span class="line">&#125;();</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码后，我们把代码整个抱在一个立即执行函数中后再次执行，在我们手动终止定时器之前，内存是不断增加的，而当我们手动的停止定时器后，因为theThing不再是个全局变量，函数执行结束，就会被释放。<br>所以在所有主流浏览器都是共享闭包作用域的实现下，避免开发的过程中出现这种链式的作用域依赖才是关键。<br>从根本上看内存泄露的原因，就是引用没有释放导致的（这不是废话么），而不是闭包本身导致的，所以我的观点是错误的使用闭包才会导致内存泄漏。</p>
+<p>##3.5 不恰当的全局缓存<br>如果我们在项目中不恰当的使用了全局缓存：主要是指只有增加缓存的操作而没有清除的操作，那么就会引起泄漏。由于缓存对象被全局变量引用着，那么在刷新页面前永远不会被清除掉。如果存储的缓存占用控件比较大的话，这种危害还会被放大。</p>
+<p>#4 JavaScript内存排查<br>我们可通过以下方式察觉内存问题：</p>
+<ul>
+<li>页面的性能随着时间的延长越来越差。 这可能是内存泄漏的症状。 内存泄漏是指，页面中的错误导致页面随着时间的延长使用的内存越来越多。</li>
+<li>页面的性能一直很糟糕。 这可能是内存膨胀的症状。 内存膨胀是指，页面为达到最佳速度而使用的内存比本应使用的内存多。</li>
+<li>页面出现延迟或者经常暂停。 这可能是频繁垃圾回收的症状。 垃圾回收是指浏览器收回内存。 浏览器决定何时进行垃圾回收。 回收期间，所有脚本执行都将暂停。因此，如果浏览器经常进行垃圾回收，脚本执行就会被频繁暂停。</li>
+</ul>
+<p>您可以使用 Chrome 任务管理器或者 Timeline（新版本已更名为Performance）内存记录发现频繁的垃圾回收。 戳这里了解更多使用细节。</p>
+<ul>
+<li>使用 Chrome 的任务管理器了解您的页面当前正在使用的内存量。内存值频繁上升和下降表示存在频繁的垃圾回收。</li>
+<li>使用 Timeline（Performance） 记录可视化一段时间内的内存使用。</li>
+<li>使用堆快照确定已分离的 DOM 树（Detached DOM tree）。<br>#5 如何避免发生内存泄漏</li>
+<li>尽量避免使用全局变量，例如使用立即执行函数的形式</li>
+<li>使用“严格模式”开发，避免因为我们的疏忽导致意外产生全局变量</li>
+<li>对于一些占用内存较大的对象，在变量不在使用后，手动将其赋值为null，例如前面例子中的超大的数组</li>
+<li>尽量避免把外层引用赋予内部变量，例如上面例子中的theThing变量</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/Javascript/" rel="tag"># Javascript</a>
+          
+            <a href="/notes/tags/内存/" rel="tag"># 内存</a>
+          
+            <a href="/notes/tags/垃圾回收/" rel="tag"># 垃圾回收</a>
+          
+            <a href="/notes/tags/优化/" rel="tag"># 优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2015/09/28/dot/" rel="next" title="前端渲染引擎doT.js解析">
+                <i class="fa fa-chevron-left"></i> 前端渲染引擎doT.js解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2016/04/28/x-origin/" rel="prev" title="跨域的原理及解决方案">
+                跨域的原理及解决方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,优化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="本文主要介绍页面加载相关的三个部分：加载流程解析，影响性能的因素，优化的方法 加载流程流程简介 对用户来说，访问页面相当简单： 1打开浏览器 --&amp;gt; 输入网址 --&amp;gt; 浏览页面  但对于浏览器来说，它与服务端之间的交互要复杂的多。通过浏览器的api(window.performance.timing)，我们可以详细的画出一个请求的完成流程：   图1   图1显示的是完整的加载流程，事">
+<meta name="keywords" content="前端,优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网站性能优化">
+<meta property="og:url" content="https://yourz.github.io/notes/2017/12/01/web-perf/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="本文主要介绍页面加载相关的三个部分：加载流程解析，影响性能的因素，优化的方法 加载流程流程简介 对用户来说，访问页面相当简单： 1打开浏览器 --&amp;gt; 输入网址 --&amp;gt; 浏览页面  但对于浏览器来说，它与服务端之间的交互要复杂的多。通过浏览器的api(window.performance.timing)，我们可以详细的画出一个请求的完成流程：   图1   图1显示的是完整的加载流程，事">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yourz.github.io/notes/2017/notes/images/web-pref/flow.png">
+<meta property="og:image" content="https://yourz.github.io/notes/2017/notes/images/web-pref/webkitflow.png">
+<meta property="og:image" content="https://yourz.github.io/notes/2017/notes/images/web-pref/dom_js_dcl.png">
+<meta property="og:image" content="https://yourz.github.io/notes/2017/notes/images/web-pref/modified_flow.png">
+<meta property="og:image" content="https://yourz.github.io/notes/2017/notes/images/web-pref/header_cache.png">
+<meta property="og:updated_time" content="2018-03-28T13:01:47.761Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="网站性能优化">
+<meta name="twitter:description" content="本文主要介绍页面加载相关的三个部分：加载流程解析，影响性能的因素，优化的方法 加载流程流程简介 对用户来说，访问页面相当简单： 1打开浏览器 --&amp;gt; 输入网址 --&amp;gt; 浏览页面  但对于浏览器来说，它与服务端之间的交互要复杂的多。通过浏览器的api(window.performance.timing)，我们可以详细的画出一个请求的完成流程：   图1   图1显示的是完整的加载流程，事">
+<meta name="twitter:image" content="https://yourz.github.io/notes/2017/notes/images/web-pref/flow.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2017/12/01/web-perf/"/>
+
+
+
+
+
+  <title>网站性能优化 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2017/12/01/web-perf/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">网站性能优化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-01T19:52:30+08:00">
+                2017-12-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/基础总结/" itemprop="url" rel="index">
+                    <span itemprop="name">基础总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要介绍页面加载相关的三个部分：加载流程解析，影响性能的因素，优化的方法</p>
+<h2 id="加载流程"><a href="#加载流程" class="headerlink" title="加载流程"></a>加载流程</h2><h3 id="流程简介"><a href="#流程简介" class="headerlink" title="流程简介"></a><strong>流程简介</strong></h3><ul>
+<li><p>对用户来说，访问页面相当简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">打开浏览器 --&gt; 输入网址 --&gt; 浏览页面</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>但对于浏览器来说，它与服务端之间的交互要复杂的多。通过浏览器的<strong>api(window.performance.timing)</strong>，我们可以详细的画出一个请求的完成流程：</p>
+</li>
+</ul>
+<p><img src="../../../notes/images/web-pref/flow.png"><center>图1</center></p>
+<blockquote>
+<ul>
+<li><strong>图1</strong>显示的是完整的加载流程，事件基本按所示顺序触发<ul>
+<li>domLoading可能在ResponseEnd之前触发</li>
+<li>unload有可能在ResponseStart之前触发</li>
+</ul>
+<ul>
+<li>部分事件是可选的，默认值为0。如Redirect、Unload和secureConnectionStart（红色），实际请求时有可能不会触发</li>
+</ul>
+<ul>
+<li>redirectStart/redirectEnd：没有重定向时，这两个字段值均为0</li>
+<li>secureConnectionStart：非HTTPS时，字段值为0</li>
+<li>unloadEventStart/unloadEventEnd：如果之前没有同源的document，字段值为0</li>
+</ul>
+<ul>
+<li>部分模块（浅蓝）事件有起止点，其他模块只有起点</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="流程解析"><a href="#流程解析" class="headerlink" title="流程解析"></a><strong>流程解析</strong></h3><p>完整的流程可以分为两个阶段：请求和渲染</p>
+<ul>
+<li><strong>请求阶段</strong>：从开始请求到获取服务端数据。简单来说就是<strong>图1中的首字节</strong>，或者再加上<strong>response</strong>。核心流程包含五部分：<ul>
+<li>重定向：重定向后需要加载新页面。对浏览器来说，新页面加载时间从redirectStart开始。对用户来说，显示时间为重定向前后页面之和</li>
+<li>缓存：浏览器已缓存的资源，不用重新发网络请求，直接从缓存中拉取</li>
+<li>DNS：域名解析，可以缓存</li>
+<li>TCP：建立TCP连接</li>
+<li>Request：未有效缓存或新资源，向服务端发起请求</li>
+</ul>
+</li>
+<li><strong>渲染阶段</strong>：浏览器接收数据后的处理，最终呈现用户可见页面。可以理解为domLoading事件之后的阶段，先后顺序依次为：<ul>
+<li>Dom就绪：Html解析，构建<strong><em>DOM Tree</em></strong>。触发domInteractive</li>
+<li>Dom和Cssom就绪：DCL（domContentLoaded），开始构建<strong><em>Render Tree</em></strong>。触发domContentLoadedEventStart，domContentLoadedEventEnd所有事件绑定完成</li>
+<li>所有资源就绪：页面上所有资源加载完成，包含图片、视频等。触发domComplete</li>
+</ul>
+</li>
+</ul>
+<p><strong>渲染阶段</strong>在webkit浏览器（chrome &amp; safari）中实际执行流程如<strong>图2</strong>所示：<br><img src="../../../notes/images/web-pref/webkitflow.png"><center>图2</center></p>
+<ul>
+<li>可以看到，HTML和CSS的解析是同步进行的。<strong><em>Render Tree</em></strong>会在<strong><em>DOM Tree</em></strong>后立即触发，表现为domContentLoadedEventStart - domInteractive的差值很小。</li>
+<li>但是，由于JS可能操作HTML，故会中断<strong><em>DOM Tree</em></strong>的构建。JS在执行时，有时会依赖样式。所以JS会减慢Dom的解析，JS需要等待CSSOM的解析，如<strong>图3</strong>所示。为了解决这种问题，有两种方法可以延迟JS的执行：<br>  <img src="../../../notes/images/web-pref/dom_js_dcl.png"><center>图3</center><ul>
+<li>JS设置为defer，domInteractive不需等待JS而正常触发，但会在DCL触发之前被执行</li>
+<li>JS设置为async，domInteractive和DCL都不需等待JS的执行</li>
+</ul>
+</li>
+</ul>
+<p>但无论JS是defer或者async，都需要保证JS中不执行doc.write，并且CSSOM在JS执行之前构建。</p>
+<h3 id="性能因素"><a href="#性能因素" class="headerlink" title="性能因素"></a><strong>性能因素</strong></h3><ul>
+<li>浏览器<ul>
+<li>请求处理</li>
+<li>渲染</li>
+<li>缓存</li>
+</ul>
+</li>
+<li>网络<ul>
+<li>状态</li>
+<li>协议</li>
+<li>传输内容</li>
+</ul>
+</li>
+<li>服务端<ul>
+<li>并发</li>
+<li>请求响应</li>
+</ul>
+</li>
+<li>编码 </li>
+</ul>
+<h3 id="性能监控"><a href="#性能监控" class="headerlink" title="性能监控"></a><strong>性能监控</strong></h3><ul>
+<li>浏览器的api查看各个事件触发的时间<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">performance.timing</span><br><span class="line">performance.getEntriesByType(<span class="string">"navigation"</span>)[<span class="number">0</span>]    <span class="comment">// new api</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>以上获取的都是时间戳，通过简单的计算，可得到实际耗时<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> res = &#123;&#125;;</span><br><span class="line"><span class="keyword">var</span> timing = <span class="built_in">window</span>.performance.timing;</span><br><span class="line"><span class="keyword">var</span> start = timing[<span class="string">'navigationStart'</span>] || <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> timing) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> timing[key] == <span class="string">'number'</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (timing[key] === <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">switch</span>(key) &#123;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'redirectStart'</span> :</span><br><span class="line">                    <span class="built_in">console</span>.log(<span class="string">'无重定向'</span>);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'unloadEventStart'</span> :</span><br><span class="line">                    <span class="built_in">console</span>.log(<span class="string">'没有unload事件：直接输入url或从其他域跳转'</span>);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> <span class="string">'secureConnectionStart'</span> :</span><br><span class="line">                    <span class="built_in">console</span>.log(<span class="string">'非HTTPS请求'</span>);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            res[key] = timing[key] - start;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// print in sequence</span></span><br><span class="line"><span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> key = <span class="string">'loadEventEnd'</span>;</span><br><span class="line">    <span class="keyword">var</span> min = res[key];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i <span class="keyword">in</span> res) &#123;</span><br><span class="line">        <span class="keyword">if</span> (res[i] &lt; min) &#123;</span><br><span class="line">            min = res[i];</span><br><span class="line">            key = i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`<span class="subst">$&#123;key&#125;</span> : <span class="subst">$&#123;res[key]&#125;</span>`</span>)</span><br><span class="line">    <span class="keyword">delete</span> res[key];</span><br><span class="line">    <span class="keyword">if</span> (key == <span class="string">'loadEventEnd'</span>) <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="优化方式"><a href="#优化方式" class="headerlink" title="优化方式"></a>优化方式</h2><p>针对影响网站服务的各种因素和限制，分别优化：</p>
+<h3 id="减少请求次数"><a href="#减少请求次数" class="headerlink" title="减少请求次数"></a><strong>减少请求次数</strong></h3><ul>
+<li>合并静态文件css、js等</li>
+<li>雪碧图 VS 内联图片（base64）<ul>
+<li>内容有所变动，雪碧图就要全部调整</li>
+<li>内联图片不能缓存</li>
+</ul>
+</li>
+<li>避免重定向<ul>
+<li>重定向可以跟踪出站流量 <a href="http://xxx.com?url=jump_url" target="_blank" rel="noopener">http://xxx.com?url=jump_url</a></li>
+<li>响应头部添加Strict-Transport-Security: max-age=31536000，可避免http -&gt; https的重定向</li>
+</ul>
+</li>
+<li>使用内联脚本、样式<ul>
+<li>主页可用</li>
+<li>脚本或样式复用率低，可用</li>
+<li>复用率高的页面建议使用外部脚本或样式</li>
+<li>组件即可内联，又可复用（React，Vue等）</li>
+</ul>
+</li>
+<li><p>浏览器缓存</p>
+<ul>
+<li><p>缓存使用示例</p>
+<p><img src="../../../notes/images/web-pref/modified_flow.png" style="zoom:50%"><center>图4</center></p>
+</li>
+<li><p>常用缓存字段列表</p>
+<p>request | response | method | content | comment<br>—|—|—|—|—<br>If-Modified-Since: time1 | Last-Modified: time2 | get or head | Tue, 12 Sep 2017 08:59:08 GMT | 是否过期，没过期返回304，会被<strong>If-None-Match</strong>覆盖<br>If-None-Match | ETag | <em> | 指纹 | 资源无变化，GET或HEAD返回304，其他方法返回412；If-Match PUT方法用来更新资源<br>| Expires| | Tue, 12 Sep 2017 08:59:08 GMT | 某个时间后失效，有效期内直接使用缓存。需要和服务端对时，会被<strong>Cache-Control:max-age</strong>覆盖<br>Cache-Control | Cache-Control| </em> | must_revalidate, public, max-age=3600 | no-cache,no-stroe,max-age（一段周期后失效）等，在http 1.1引入</p>
+</li>
+<li><p>合理设置缓存</p>
+<p>  <img src="../../../notes/images/web-pref/header_cache.png" style="zoom:40%"><center>图5</center></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="减小请求文件"><a href="#减小请求文件" class="headerlink" title="减小请求文件"></a><strong>减小请求文件</strong></h3><ul>
+<li>支持压缩（传输，浏览器解压）<ul>
+<li>Request: Accept-Encoding:gzip, deflate, sdch, br</li>
+<li>Response: Content-Encoding:gzip</li>
+<li>Response: vary: Accept-Encoding（代理商）</li>
+</ul>
+</li>
+<li>压缩静态资源文件</li>
+<li>使用合适的图片</li>
+</ul>
+<h3 id="缩短请求路径"><a href="#缩短请求路径" class="headerlink" title="缩短请求路径"></a><strong>缩短请求路径</strong></h3><ul>
+<li>CDN（内容分发网络）</li>
+<li>减少DNS查找（域名尽量少）</li>
+<li>使用HTTP，而不是HTTPS（安全性）</li>
+<li>长连接 (connection:keep-alive)<ul>
+<li>同一TCP连接，可以发送多个请求</li>
+<li>Transfer-Encoding: chunked，chunked长度为0，本次连接终止 </li>
+</ul>
+</li>
+</ul>
+<h3 id="节省渲染时间"><a href="#节省渲染时间" class="headerlink" title="节省渲染时间"></a><strong>节省渲染时间</strong></h3><ul>
+<li>样式<ul>
+<li>样式放在顶部（DCL：防止闪烁、白屏等）</li>
+<li>少使用@import，会同步导入css文件</li>
+<li>避免css表达式</li>
+</ul>
+</li>
+<li>脚本<ul>
+<li>脚本放在底部，会阻塞其他资源的下载（白屏等）</li>
+<li>按需加载</li>
+</ul>
+</li>
+</ul>
+<h3 id="请求并发"><a href="#请求并发" class="headerlink" title="请求并发"></a><strong>请求并发</strong></h3><ul>
+<li>Domain sharding<ul>
+<li>浏览器只能对同一Domain最多请求6~8个连接，资源分散（DNS查找）</li>
+</ul>
+</li>
+<li>Pipelining<ul>
+<li>同时发送多个请求，但是服务端依然需要依次响应 </li>
+</ul>
+</li>
+</ul>
+<h2 id="http2"><a href="#http2" class="headerlink" title="http2"></a>http2</h2><ul>
+<li><strong>简介</strong>（移步查看更多<strong><a href="http2">http2</a></strong>）<ul>
+<li>压缩header，header不再使用字段，使用位标识</li>
+<li>服务端推送</li>
+<li>frame和stream<ul>
+<li>每个请求或应答相当于一个stream（id:奇数为客户端）</li>
+<li>响应数据(stream)切成多个帧frame(所属stream id)，可交叉传送</li>
+</ul>
+</li>
+<li>流优先级和依赖</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>[浏览器工作原理]：<a href="https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/" target="_blank" rel="noopener">https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/</a></li>
+<li>[DCL]：<a href="https://calendar.perfplanet.com/2012/deciphering-the-critical-rendering-path/" target="_blank" rel="noopener">https://calendar.perfplanet.com/2012/deciphering-the-critical-rendering-path/</a></li>
+<li>[HTTP headers]：<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/If-Match" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/If-Match</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/优化/" rel="tag"># 优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2017/10/02/vuex-code-analysis/" rel="next" title="Vuex框架原理与源码分析">
+                <i class="fa fa-chevron-left"></i> Vuex框架原理与源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#加载流程"><span class="nav-number">1.</span> <span class="nav-text">加载流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#流程简介"><span class="nav-number">1.1.</span> <span class="nav-text">流程简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流程解析"><span class="nav-number">1.2.</span> <span class="nav-text">流程解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能因素"><span class="nav-number">1.3.</span> <span class="nav-text">性能因素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能监控"><span class="nav-number">1.4.</span> <span class="nav-text">性能监控</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化方式"><span class="nav-number">2.</span> <span class="nav-text">优化方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#减少请求次数"><span class="nav-number">2.1.</span> <span class="nav-text">减少请求次数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减小请求文件"><span class="nav-number">2.2.</span> <span class="nav-text">减小请求文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缩短请求路径"><span class="nav-number">2.3.</span> <span class="nav-text">缩短请求路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节省渲染时间"><span class="nav-number">2.4.</span> <span class="nav-text">节省渲染时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求并发"><span class="nav-number">2.5.</span> <span class="nav-text">请求并发</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#http2"><span class="nav-number">3.</span> <span class="nav-text">http2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,Javascript,继承,面向对象," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="简介 JS作为脚本语言，主要是在浏览器中执行阶段性的特定任务，所以有其本身的特点： 一切都是对象，函数(function)也不例外 每个对象都有内置变量constructor和__proto__，constructor指向构造函数，__proto__指向构造函数的原型   后续的不断发展，在很多方面得到了延伸： 模块化(AMD/CMD/CommonJs) MVVM框架(React/Vue/Angu">
+<meta name="keywords" content="前端,Javascript,继承,面向对象">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS继承浅析">
+<meta property="og:url" content="https://yourz.github.io/notes/2015/08/11/js-extend/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="简介 JS作为脚本语言，主要是在浏览器中执行阶段性的特定任务，所以有其本身的特点： 一切都是对象，函数(function)也不例外 每个对象都有内置变量constructor和__proto__，constructor指向构造函数，__proto__指向构造函数的原型   后续的不断发展，在很多方面得到了延伸： 模块化(AMD/CMD/CommonJs) MVVM框架(React/Vue/Angu">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yourz.github.io/notes/images/inherit/extend.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/inherit/object.png">
+<meta property="og:updated_time" content="2018-03-28T12:59:57.506Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JS继承浅析">
+<meta name="twitter:description" content="简介 JS作为脚本语言，主要是在浏览器中执行阶段性的特定任务，所以有其本身的特点： 一切都是对象，函数(function)也不例外 每个对象都有内置变量constructor和__proto__，constructor指向构造函数，__proto__指向构造函数的原型   后续的不断发展，在很多方面得到了延伸： 模块化(AMD/CMD/CommonJs) MVVM框架(React/Vue/Angu">
+<meta name="twitter:image" content="https://yourz.github.io/notes/images/inherit/extend.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2015/08/11/js-extend/"/>
+
+
+
+
+
+  <title>JS继承浅析 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2015/08/11/js-extend/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JS继承浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-08-11T19:48:12+08:00">
+                2015-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/基础总结/" itemprop="url" rel="index">
+                    <span itemprop="name">基础总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>JS作为脚本语言，主要是在浏览器中执行阶段性的特定任务，所以有其本身的特点：<ul>
+<li>一切都是对象，函数(function)也不例外</li>
+<li>每个对象都有内置变量constructor和__proto__，constructor指向构造函数，__proto__指向构造函数的原型</li>
+</ul>
+</li>
+<li>后续的不断发展，在很多方面得到了延伸：<ul>
+<li>模块化(AMD/CMD/CommonJs)</li>
+<li>MVVM框架(React/Vue/Angular)</li>
+<li>前后端适配（Node/Browser)</li>
+</ul>
+</li>
+<li>在推出新的规范ES6的同时，引入了类及继承。本文简要介绍继承，并讨论其在JS中的实现。<ul>
+<li>继承是面向对象四大特征（抽象、封装、继承、多态）之一，主要为了复用已有功能。使子类可直接拥有或访问，父类允许的成员变量和方法</li>
+<li>JS的继承方式比较奇特，不像传统的面向对象语言（C++、Java等），而是通过其原型链</li>
+<li>一个对象在访问变量或者函数时，首先在类内部查找，其次是父类内部，最后是其.__proto__</li>
+</ul>
+</li>
+</ul>
+<h2 id="实现继承"><a href="#实现继承" class="headerlink" title="实现继承"></a>实现继承</h2><h3 id="创建基类"><a href="#创建基类" class="headerlink" title="创建基类"></a>创建基类</h3><ul>
+<li><p>创建一个基类</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Widget = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">   <span class="comment">// 内部成员变量</span></span><br><span class="line">   <span class="keyword">this</span>.messages = [];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方法</span></span><br><span class="line">Widget.prototype.push = <span class="function"><span class="keyword">function</span>(<span class="params">element</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.messages.push(element);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>子类SubWidget继承后，可访问父类的变量和方法：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sub1 = <span class="keyword">new</span> SubWidget( <span class="string">'foo'</span> );</span><br><span class="line"><span class="keyword">var</span> sub2 = <span class="keyword">new</span> SubWidget( <span class="string">'bar'</span> );</span><br><span class="line"></span><br><span class="line">sub1.messages.push( <span class="string">'foo'</span> );</span><br><span class="line">sub2.messages.push( <span class="string">'bar'</span> );</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(sub1.messages); <span class="comment">// ['foo']</span></span><br><span class="line"><span class="built_in">console</span>.log(sub2.messages); <span class="comment">// ['bar']</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="实例继承"><a href="#实例继承" class="headerlink" title="实例继承"></a>实例继承</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SubWidget = <span class="keyword">new</span> Widget();</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>优点：SubWidget是一个实例（非函数），可以访问父类及原型的所有变量和方法</li>
+<li>缺点：没有prototype属性，并且共享所有元素</li>
+</ul>
+</blockquote>
+<h3 id="原型继承"><a href="#原型继承" class="headerlink" title="原型继承"></a>原型继承</h3><p>继承可以分成两部分：父类成员（变量或方法）和prototype成员</p>
+<h4 id="1-继承父类成员"><a href="#1-继承父类成员" class="headerlink" title="1 继承父类成员"></a>1 继承父类成员</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> SubWidget = <span class="function"><span class="keyword">function</span>(<span class="params"> name </span>)</span>&#123;</span><br><span class="line">  <span class="comment">// 继承父类的成员</span></span><br><span class="line">  Widget.call( <span class="keyword">this</span>, <span class="built_in">arguments</span>);</span><br><span class="line">  <span class="comment">// 初始化自有成员</span></span><br><span class="line">  <span class="keyword">this</span>.name = name;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>后初始化自有成员变量或方法，可覆盖父类的同名变量或方法。此时，SubWidget.prototype指向空对象</p>
+</blockquote>
+<h4 id="2-继承父类prototype"><a href="#2-继承父类prototype" class="headerlink" title="2 继承父类prototype"></a>2 继承父类prototype</h4><p>只要能显示<em> 访问父类prototype中的变量和方法 </em>即可</p>
+<p>2.1 <strong>原型为父类的实例</strong><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SubWidget.prototype = <span class="keyword">new</span> Widget();</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>子类prototype中有父类的内部变量，且constructor指向父类（而不是子类本身）。</p>
+</blockquote>
+<p>2.2 <strong>原型为父类原型</strong><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SubWidget.prototype = Widget.prototype;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>改变子类prototype的同时，会改变父类prototype</p>
+</blockquote>
+<p>2.3 <strong>混合</strong><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Super</span>(<span class="params">parent</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> F = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;&#125;;</span><br><span class="line">  F.prototype = parent.prototype;</span><br><span class="line">  <span class="keyword">this</span>.prototype = <span class="keyword">new</span> F();</span><br><span class="line">  <span class="keyword">this</span>.prototype.constructor = <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">super</span>.call(SubWidget, Widget);</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>需要增加一个内部函数</p>
+</blockquote>
+<h3 id="完整实现"><a href="#完整实现" class="headerlink" title="完整实现"></a>完整实现</h3><p>结合1和2.3的完整实现如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">superProtoType</span>(<span class="params">parent</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> F = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;&#125;;</span><br><span class="line">  F.prototype = parent.prototype;</span><br><span class="line">  <span class="keyword">this</span>.prototype = <span class="keyword">new</span> F();</span><br><span class="line">  <span class="keyword">this</span>.prototype.constructor = <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> SubWidget = (<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> constructFunc = <span class="function"><span class="keyword">function</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">    Widget.call(<span class="keyword">this</span>, <span class="keyword">this</span>.arguments);</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">  &#125;;</span><br><span class="line">  superProtoType.call(constructFunc, Widget);</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> constructFunc;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>是不是类似于ES6实现的继承方式^_^</p>
+</blockquote>
+<p><img src="/notes/images/inherit/extend.png" alt="图1"><center>图1：数字为优先级</center></p>
+<h2 id="继承与实例"><a href="#继承与实例" class="headerlink" title="继承与实例"></a>继承与实例</h2><ul>
+<li><p>函数.prototype.constructor需要指向自身（Code1：函数默认创建时，即指向自身），否则会改变实例的constructor指向</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> testCls = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.array = [];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> inst = <span class="keyword">new</span> testCls();</span><br><span class="line"><span class="built_in">console</span>.log(inst.constructor);                <span class="comment">// testCls</span></span><br><span class="line"><span class="built_in">console</span>.log(testCls.prototype.constructor);   <span class="comment">// testCls</span></span><br><span class="line"><span class="built_in">console</span>.log(testCls.prototype);               <span class="comment">// Object&#123;constructor: function&#125;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Code1：log中可以看出，.constructor都指向testCls</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> testCls = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.array = [];</span><br><span class="line">&#125;</span><br><span class="line">testCls.prototype = &#123;</span><br><span class="line">  push: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> inst = <span class="keyword">new</span> testCls();</span><br><span class="line"><span class="built_in">console</span>.log(inst.constructor);              <span class="comment">// Object function</span></span><br><span class="line"><span class="built_in">console</span>.log(testCls.prototype.constructor); <span class="comment">// Object function</span></span><br><span class="line"><span class="built_in">console</span>.log(testCls.prototype);             <span class="comment">// Object &#123;push: function&#125;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>Code2：改变.prototype指向后，.constructor都指向改变后的函数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> testCls = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.array = [];</span><br><span class="line">&#125;</span><br><span class="line">testCls.prototype = &#123;</span><br><span class="line">  push: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">constructor</span>: testCls</span><br><span class="line">&#125;;</span><br><span class="line">var inst = new testCls();</span><br><span class="line">console.log(inst.<span class="keyword">constructor</span>);              // testCls</span><br><span class="line">console.log(testCls.prototype.<span class="keyword">constructor</span>); // testCls</span><br><span class="line">console.log(testCls.prototype);             // Object &#123;push: <span class="function"><span class="keyword">function</span>, <span class="title">constructor</span>: <span class="title">function</span>&#125;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>Code3：与Code1默认行为一致</p>
+</blockquote>
+</li>
+<li><p>A instanceof B 的判断逻辑为：A.__proto__…__proto__ === B.prototype。所以在图1中，sub1 instanceof SubWidget和Widget均返回true。</p>
+</li>
+<li>Function、Object的构造函数为Function，所以Function(Object).__proto__ === Function.prototype</li>
+</ul>
+<blockquote>
+<p>图2红线所示，Function，Object为Function的实例</p>
+</blockquote>
+<ul>
+<li>Function.prototype是一个<em>函数</em>，构造函数是Function。但Function.prototype.__proto__ === Object.prototype，由3可替换为Function(Object).__proto__.__proto__ === Object.prototype</li>
+</ul>
+<blockquote>
+<p>图2红线和绿线所示，Function，Object为Object的实例</p>
+</blockquote>
+<p><img src="/notes/images/inherit/object.png" alt="图2"><center>图2</center></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/Javascript/" rel="tag"># Javascript</a>
+          
+            <a href="/notes/tags/继承/" rel="tag"># 继承</a>
+          
+            <a href="/notes/tags/面向对象/" rel="tag"># 面向对象</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2015/07/22/http2/" rel="next" title="HTTP/2">
+                <i class="fa fa-chevron-left"></i> HTTP/2
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2015/09/28/dot/" rel="prev" title="前端渲染引擎doT.js解析">
+                前端渲染引擎doT.js解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现继承"><span class="nav-number">2.</span> <span class="nav-text">实现继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建基类"><span class="nav-number">2.1.</span> <span class="nav-text">创建基类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例继承"><span class="nav-number">2.2.</span> <span class="nav-text">实例继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原型继承"><span class="nav-number">2.3.</span> <span class="nav-text">原型继承</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-继承父类成员"><span class="nav-number">2.3.1.</span> <span class="nav-text">1 继承父类成员</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-继承父类prototype"><span class="nav-number">2.3.2.</span> <span class="nav-text">2 继承父类prototype</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完整实现"><span class="nav-number">2.4.</span> <span class="nav-text">完整实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#继承与实例"><span class="nav-number">3.</span> <span class="nav-text">继承与实例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

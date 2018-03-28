@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,Javascript,框架,Vue," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前言vue源码工程其实内容相当丰富，不仅包含了vue主体内容，其中工程的结构方法也都值得我们学习，所以这一系列内容打算对整个vue源码做一个解析。此处以2.2.0版本为例，进行分析。内容大概分为：  1.使用的主要插件或者工具简介（学习的前提）2.文件目录结构介绍3.代码执行流程介绍4.observer， dep，watcher观察模式介绍5.dom渲染介绍      ##二、主要插件和工具 ##">
+<meta name="keywords" content="前端,Javascript,框架,Vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue源码解读(一)">
+<meta property="og:url" content="https://yourz.github.io/notes/2017/06/28/vue1/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="前言vue源码工程其实内容相当丰富，不仅包含了vue主体内容，其中工程的结构方法也都值得我们学习，所以这一系列内容打算对整个vue源码做一个解析。此处以2.2.0版本为例，进行分析。内容大概分为：  1.使用的主要插件或者工具简介（学习的前提）2.文件目录结构介绍3.代码执行流程介绍4.observer， dep，watcher观察模式介绍5.dom渲染介绍      ##二、主要插件和工具 ##">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yourz.github.io/notes/images/vue/rollup.png">
+<meta property="og:updated_time" content="2018-03-28T13:00:24.274Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vue源码解读(一)">
+<meta name="twitter:description" content="前言vue源码工程其实内容相当丰富，不仅包含了vue主体内容，其中工程的结构方法也都值得我们学习，所以这一系列内容打算对整个vue源码做一个解析。此处以2.2.0版本为例，进行分析。内容大概分为：  1.使用的主要插件或者工具简介（学习的前提）2.文件目录结构介绍3.代码执行流程介绍4.observer， dep，watcher观察模式介绍5.dom渲染介绍      ##二、主要插件和工具 ##">
+<meta name="twitter:image" content="https://yourz.github.io/notes/images/vue/rollup.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2017/06/28/vue1/"/>
+
+
+
+
+
+  <title>Vue源码解读(一) | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2017/06/28/vue1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Vue源码解读(一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-28T20:36:38+08:00">
+                2017-06-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/架构相关/" itemprop="url" rel="index">
+                    <span itemprop="name">架构相关</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>vue源码工程其实内容相当丰富，不仅包含了vue主体内容，其中工程的结构方法也都值得我们学习，所以这一系列内容打算对整个vue源码做一个解析。此处以2.2.0版本为例，进行分析。内容大概分为：</p>
+<blockquote>
+<p>1.使用的主要插件或者工具简介（学习的前提）<br>2.文件目录结构介绍<br>3.代码执行流程介绍<br>4.observer， dep，watcher观察模式介绍<br>5.dom渲染介绍    </p>
+</blockquote>
+<p>##二、主要插件和工具</p>
+<p>###1.npm<br>这个无需多言，项目中包含一个主要文件 package.json文件即证明其中要用到不少npm的包，查看其package.json文件可对项目用到的一些工具和包有个大概了解。（以2.2.0版本为例）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"name"</span>: <span class="string">"vue"</span>,</span><br><span class="line">  <span class="string">"version"</span>: <span class="string">"2.2.0"</span>,</span><br><span class="line">  <span class="string">"description"</span>: <span class="string">"Reactive, component-oriented view layer for modern web interfaces."</span>,</span><br><span class="line">  <span class="string">"main"</span>: <span class="string">"dist/vue.runtime.common.js"</span>,</span><br><span class="line">  <span class="string">"module"</span>: <span class="string">"dist/vue.runtime.esm.js"</span>,</span><br><span class="line">  <span class="string">"unpkg"</span>: <span class="string">"dist/vue.js"</span>,</span><br><span class="line">  <span class="string">"typings"</span>: <span class="string">"types/index.d.ts"</span>,</span><br><span class="line">  <span class="string">"files"</span>: [</span><br><span class="line">    <span class="string">"dist/vue.js"</span>,</span><br><span class="line">    <span class="string">"dist/vue.min.js"</span>,</span><br><span class="line">    <span class="string">"dist/vue.runtime.js"</span>,</span><br><span class="line">    <span class="string">"dist/vue.runtime.min.js"</span>,</span><br><span class="line">    <span class="string">"dist/vue.common.js"</span>,</span><br><span class="line">    <span class="string">"dist/vue.runtime.common.js"</span>,</span><br><span class="line">    <span class="string">"src"</span>,</span><br><span class="line">    <span class="string">"types/index.d.ts"</span>,</span><br><span class="line">    <span class="string">"types/options.d.ts"</span>,</span><br><span class="line">    <span class="string">"types/plugin.d.ts"</span>,</span><br><span class="line">    <span class="string">"types/vnode.d.ts"</span>,</span><br><span class="line">    <span class="string">"types/vue.d.ts"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"dev"</span>: <span class="string">"TARGET=web-full-dev rollup -w -c build/config.js"</span>,</span><br><span class="line">    <span class="string">"dev:cjs"</span>: <span class="string">"TARGET=web-runtime-cjs rollup -w -c build/config.js"</span>,</span><br><span class="line">    <span class="string">"dev:test"</span>: <span class="string">"karma start build/karma.dev.config.js"</span>,</span><br><span class="line">    <span class="string">"dev:ssr"</span>: <span class="string">"TARGET=web-server-renderer rollup -w -c build/config.js"</span>,</span><br><span class="line">    <span class="string">"dev:compiler"</span>: <span class="string">"TARGET=web-compiler rollup -w -c build/config.js"</span>,</span><br><span class="line">    <span class="string">"dev:weex"</span>: <span class="string">"TARGET=weex-framework rollup -w -c build/config.js"</span>,</span><br><span class="line">    <span class="string">"dev:weex:compiler"</span>: <span class="string">"TARGET=weex-compiler rollup -w -c build/config.js"</span>,</span><br><span class="line">    <span class="string">"build"</span>: <span class="string">"node build/build.js"</span>,</span><br><span class="line">    <span class="string">"build:ssr"</span>: <span class="string">"npm run build -- vue.runtime.common.js,vue-server-renderer"</span>,</span><br><span class="line">    <span class="string">"build:weex"</span>: <span class="string">"npm run build -- weex-vue-framework,weex-template-compiler"</span>,</span><br><span class="line">    <span class="string">"test"</span>: <span class="string">"npm run lint &amp;&amp; flow check &amp;&amp; npm run test:types &amp;&amp; npm run test:cover &amp;&amp; npm run test:e2e -- --env phantomjs &amp;&amp; npm run test:ssr"</span>,</span><br><span class="line">    <span class="string">"test:unit"</span>: <span class="string">"karma start build/karma.unit.config.js"</span>,</span><br><span class="line">    <span class="string">"test:cover"</span>: <span class="string">"karma start build/karma.cover.config.js"</span>,</span><br><span class="line">    <span class="string">"test:e2e"</span>: <span class="string">"npm run build -- vue.min.js &amp;&amp; node test/e2e/runner.js"</span>,</span><br><span class="line">    <span class="string">"test:weex"</span>: <span class="string">"npm run build:weex &amp;&amp; jasmine JASMINE_CONFIG_PATH=test/weex/jasmine.json"</span>,</span><br><span class="line">    <span class="string">"test:ssr"</span>: <span class="string">"npm run build:ssr &amp;&amp; jasmine JASMINE_CONFIG_PATH=test/ssr/jasmine.json"</span>,</span><br><span class="line">    <span class="string">"test:sauce"</span>: <span class="string">"npm run sauce -- 0 &amp;&amp; npm run sauce -- 1 &amp;&amp; npm run sauce -- 2"</span>,</span><br><span class="line">    <span class="string">"test:types"</span>: <span class="string">"tsc -p ./types/test/tsconfig.json"</span>,</span><br><span class="line">    <span class="string">"lint"</span>: <span class="string">"eslint src build test"</span>,</span><br><span class="line">    <span class="string">"flow"</span>: <span class="string">"flow check"</span>,</span><br><span class="line">    <span class="string">"sauce"</span>: <span class="string">"SAUCE=true karma start build/karma.sauce.config.js"</span>,</span><br><span class="line">    <span class="string">"bench:ssr"</span>: <span class="string">"npm run build:ssr &amp;&amp; NODE_ENV=production node benchmarks/ssr/renderToString.js &amp;&amp; NODE_ENV=production VUE_ENV=server node benchmarks/ssr/renderToStream.js"</span>,</span><br><span class="line">    <span class="string">"release"</span>: <span class="string">"bash build/release.sh"</span>,</span><br><span class="line">    <span class="string">"release:weex"</span>: <span class="string">"bash build/release-weex.sh"</span>,</span><br><span class="line">    <span class="string">"install:hooks"</span>: <span class="string">"ln -fs ../../build/git-hooks/pre-commit .git/hooks/pre-commit"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"repository"</span>: &#123;</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"git"</span>,</span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"git+https://github.com/vuejs/vue.git"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"keywords"</span>: [</span><br><span class="line">    <span class="string">"vue"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"author"</span>: <span class="string">"Evan You"</span>,</span><br><span class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span>,</span><br><span class="line">  <span class="string">"bugs"</span>: &#123;</span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"https://github.com/vuejs/vue/issues"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"homepage"</span>: <span class="string">"https://github.com/vuejs/vue#readme"</span>,</span><br><span class="line">  <span class="string">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"babel-core"</span>: <span class="string">"^6.9.0"</span>,</span><br><span class="line">    <span class="string">"babel-eslint"</span>: <span class="string">"^7.1.0"</span>,</span><br><span class="line">    <span class="string">"babel-helper-vue-jsx-merge-props"</span>: <span class="string">"^2.0.2"</span>,</span><br><span class="line">    <span class="string">"babel-loader"</span>: <span class="string">"^6.2.4"</span>,</span><br><span class="line">    <span class="string">"babel-plugin-istanbul"</span>: <span class="string">"^4.0.0"</span>,</span><br><span class="line">    <span class="string">"babel-plugin-syntax-dynamic-import"</span>: <span class="string">"^6.18.0"</span>,</span><br><span class="line">    <span class="string">"babel-plugin-syntax-jsx"</span>: <span class="string">"^6.18.0"</span>,</span><br><span class="line">    <span class="string">"babel-plugin-transform-vue-jsx"</span>: <span class="string">"^3.2.0"</span>,</span><br><span class="line">    <span class="string">"babel-preset-es2015"</span>: <span class="string">"^6.9.0"</span>,</span><br><span class="line">    <span class="string">"babel-preset-flow-vue"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"buble"</span>: <span class="string">"^0.15.2"</span>,</span><br><span class="line">    <span class="string">"chromedriver"</span>: <span class="string">"^2.21.2"</span>,</span><br><span class="line">    <span class="string">"codecov.io"</span>: <span class="string">"^0.1.6"</span>,</span><br><span class="line">    <span class="string">"cross-spawn"</span>: <span class="string">"^5.0.1"</span>,</span><br><span class="line">    <span class="string">"de-indent"</span>: <span class="string">"^1.0.2"</span>,</span><br><span class="line">    <span class="string">"es6-promise"</span>: <span class="string">"^4.0.5"</span>,</span><br><span class="line">    <span class="string">"eslint"</span>: <span class="string">"^3.10.1"</span>,</span><br><span class="line">    <span class="string">"eslint-config-vue"</span>: <span class="string">"^2.0.1"</span>,</span><br><span class="line">    <span class="string">"eslint-loader"</span>: <span class="string">"^1.3.0"</span>,</span><br><span class="line">    <span class="string">"eslint-plugin-flowtype"</span>: <span class="string">"^2.16.0"</span>,</span><br><span class="line">    <span class="string">"eslint-plugin-jasmine"</span>: <span class="string">"^2.1.0"</span>,</span><br><span class="line">    <span class="string">"eslint-plugin-vue"</span>: <span class="string">"^2.0.0"</span>,</span><br><span class="line">    <span class="string">"flow-bin"</span>: <span class="string">"^0.39.0"</span>,</span><br><span class="line">    <span class="string">"he"</span>: <span class="string">"^1.1.0"</span>,</span><br><span class="line">    <span class="string">"http-server"</span>: <span class="string">"^0.9.0"</span>,</span><br><span class="line">    <span class="string">"jasmine"</span>: <span class="string">"^2.5.2"</span>,</span><br><span class="line">    <span class="string">"jasmine-core"</span>: <span class="string">"^2.5.2"</span>,</span><br><span class="line">    <span class="string">"karma"</span>: <span class="string">"^1.1.0"</span>,</span><br><span class="line">    <span class="string">"karma-chrome-launcher"</span>: <span class="string">"^2.0.0"</span>,</span><br><span class="line">    <span class="string">"karma-coverage"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"karma-firefox-launcher"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"karma-jasmine"</span>: <span class="string">"^1.0.2"</span>,</span><br><span class="line">    <span class="string">"karma-mocha-reporter"</span>: <span class="string">"^2.0.4"</span>,</span><br><span class="line">    <span class="string">"karma-phantomjs-launcher"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"karma-safari-launcher"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"karma-sauce-launcher"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"karma-sourcemap-loader"</span>: <span class="string">"^0.3.0"</span>,</span><br><span class="line">    <span class="string">"karma-webpack"</span>: <span class="string">"^2.0.1"</span>,</span><br><span class="line">    <span class="string">"lodash"</span>: <span class="string">"^4.17.1"</span>,</span><br><span class="line">    <span class="string">"nightwatch"</span>: <span class="string">"^0.9.9"</span>,</span><br><span class="line">    <span class="string">"nightwatch-helpers"</span>: <span class="string">"^1.2.0"</span>,</span><br><span class="line">    <span class="string">"phantomjs-prebuilt"</span>: <span class="string">"^2.1.1"</span>,</span><br><span class="line">    <span class="string">"resolve"</span>: <span class="string">"^1.2.0"</span>,</span><br><span class="line">    <span class="string">"rollup"</span>: <span class="string">"^0.41.4"</span>,</span><br><span class="line">    <span class="string">"rollup-plugin-alias"</span>: <span class="string">"^1.2.0"</span>,</span><br><span class="line">    <span class="string">"rollup-plugin-babel"</span>: <span class="string">"^2.4.0"</span>,</span><br><span class="line">    <span class="string">"rollup-plugin-buble"</span>: <span class="string">"^0.15.0"</span>,</span><br><span class="line">    <span class="string">"rollup-plugin-flow-no-whitespace"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"rollup-plugin-replace"</span>: <span class="string">"^1.1.0"</span>,</span><br><span class="line">    <span class="string">"rollup-watch"</span>: <span class="string">"^3.2.2"</span>,</span><br><span class="line">    <span class="string">"selenium-server"</span>: <span class="string">"^2.53.1"</span>,</span><br><span class="line">    <span class="string">"typescript"</span>: <span class="string">"^2.1.6"</span>,</span><br><span class="line">    <span class="string">"uglify-js"</span>: <span class="string">"^2.6.2"</span>,</span><br><span class="line">    <span class="string">"vue-ssr-html-stream"</span>: <span class="string">"^2.1.0"</span>,</span><br><span class="line">    <span class="string">"vue-ssr-webpack-plugin"</span>: <span class="string">"^1.0.0"</span>,</span><br><span class="line">    <span class="string">"webpack"</span>: <span class="string">"^2.2.0"</span>,</span><br><span class="line">    <span class="string">"weex-js-runtime"</span>: <span class="string">"^0.17.0-alpha4"</span>,</span><br><span class="line">    <span class="string">"weex-vdom-tester"</span>: <span class="string">"^0.1.4"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于npm不了解的同学请自行百度，资料很多，这里不再赘述。(<a href="http://www.cnblogs.com/tzyy/p/5193811.html" target="_blank" rel="noopener">http://www.cnblogs.com/tzyy/p/5193811.html</a> 这里有个比较全面的package.json文件内容介绍)</p>
+<p>###2.flow<br>官网：<a href="https://flow.org/en/" target="_blank" rel="noopener">https://flow.org/en/</a>， 中文地址：<a href="https://zhenyong.github.io/flowtype/" target="_blank" rel="noopener">https://zhenyong.github.io/flowtype/</a><br>flow是一个静态类型检查工具，不同于typeScript 它更像是个小且轻便的工具。<br>另外一点需注意的是，它也有一个配置文件 .flowconfig 相关配置信息 <a href="https://zhenyong.github.io/flowtype/docs/advanced-configuration.html" target="_blank" rel="noopener">https://zhenyong.github.io/flowtype/docs/advanced-configuration.html</a>，可以配置诸如是否额外检测某些文件或者目录 [include]， 忽略某些文件[ignore]，包含指定声明[libs]，其他配置[options]等<br>在vue中flowconfig配置如下:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[ignore]</span><br><span class="line">.*<span class="regexp">/node_modules/</span>.*</span><br><span class="line">.*<span class="regexp">/test/</span>.*</span><br><span class="line">.*<span class="regexp">/build/</span>.*</span><br><span class="line">.*<span class="regexp">/examples/</span>.*</span><br><span class="line">.*<span class="regexp">/benchmarks/</span>.*</span><br><span class="line"> </span><br><span class="line">[include]</span><br><span class="line"> </span><br><span class="line">[libs]</span><br><span class="line">flow</span><br><span class="line"> </span><br><span class="line">[options]</span><br><span class="line">unsafe.enable_getters_and_setters=<span class="literal">true</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^compiler/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/compiler/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^core/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/core/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^shared/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/shared/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^web/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/platforms/web/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^weex/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/platforms/weex/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^server/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/server/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^entries/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/entries/\1'</span></span><br><span class="line"><span class="built_in">module</span>.name_mapper=<span class="string">'^sfc/\(.*\)$'</span> -&gt; <span class="string">'&lt;PROJECT_ROOT&gt;/src/sfc/\1'</span></span><br></pre></td></tr></table></figure>
+<p>其中注意一点 libs配置为flow目录结构，查看项目的flow文件夹即可看到，其中含有各种类或者接口的声明 如，compiler, component, vnode等，这几个主要的类在vue项目中使用频率很高，而且属性众多，用这样的配置方便查看类结构是否符合预期，或者作为工具api查看。<br>另外在查看文件的时候可以看到，若再文件开头标有 /<em> @flow </em>/ 则表示该文件受flow检查约束，否则没有。</p>
+<p>###3.rollup<br>rollup是一个npm包，主要作用为用es6模块方式打包文件。<br>介绍：<a href="https://www.npmjs.com/package/rollup" target="_blank" rel="noopener">https://www.npmjs.com/package/rollup</a><br>配置：<a href="https://github.com/rollup/rollup/wiki/Command-Line-Interface" target="_blank" rel="noopener">https://github.com/rollup/rollup/wiki/Command-Line-Interface</a><br>查看上述package.json中的scripts 字段即可发现，作者所用打包工具正是rollup， dev各种命令即可看到。<br>另外也能发现其中频繁提到的一个目录，build文件夹，所有相关配置文件，包括dev运行，build构建，以及test运行等的配置文件 均在build目录下。<br>这里略微多提一下，官网中也提到存在几套不同版本的vue, 如下图所示：<br><img src="/notes/images/vue/rollup.png" alt="rollup"><br>对应vue生成的dist目录下的文件vue.common.js，vue.esm.js， vue.js等内容。在package.json的scripts中设定了TARGET的值，在build/config.js 文件中可以看到，target对应的builds的值，vue.js文件对应的入口文件为src/entries/web-runtime-with-compiler.js，那么除了这个之外还有其他的对应的入口文件如web-runtime.js，这个不同的入口在后续阅读代码的时候会看到还是有一些不同的地方的。</p>
+<p>###4.TypeScript *<br>官网：<a href="http://www.typescriptlang.org/index.html" target="_blank" rel="noopener">http://www.typescriptlang.org/index.html</a><br>TypeScript（以下简称TS）是JavaScript的超集，由微软开发，它类似于coffescript，旨在提高写JS的效率，增加了一些特性如静态语法检查等，它的文件后缀为ts, ts文件可以编译为js文件。<br>在vue项目，主要是用TS写了一个小型的测试，文件主要都在types目录下。其中test/tsconfig.json是TS的配置文件，可以简单看下，这块内容相对独立。  </p>
+<p>###5.ESLint *<br>了解的人应该比较多，主要是用来做一些简单的语法检查和统一代码风格。<br>网址：<a href="https://github.com/eslint/eslint" target="_blank" rel="noopener">https://github.com/eslint/eslint</a><br>vue项目中只有在lint命令下可以看到只检查了 src, build 和test 目录，用处主要是在npm run test 以及build/git-hooks里设置，即当你提交vue的代码时，会设定检查eslint，通常情况用不到。</p>
+<p>##三、其他</p>
+<p><font color="red">阅读源码之前，有必要对Vue的用法有个大致的了解，最好有些使用经验。</font>在了解了作者对外暴露的接口之后，再去阅读接口背后的逻辑和作者的思路才能事半功倍。否则直接源码，对组件声明过程中各类触发的事件，Vue上挂载的函数，组件内可调用的函数都是抓瞎状态，读起来更容易找不到方向。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/Javascript/" rel="tag"># Javascript</a>
+          
+            <a href="/notes/tags/框架/" rel="tag"># 框架</a>
+          
+            <a href="/notes/tags/Vue/" rel="tag"># Vue</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2016/11/28/webpack/" rel="next" title="Webpack入门">
+                <i class="fa fa-chevron-left"></i> Webpack入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2017/07/02/vue2/" rel="prev" title="Vue源码解读(二)">
+                Vue源码解读(二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="CSS,BFC,IFC,布局,前端," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前言在日常开发过程中，经常遇见margin折叠、文本遮挡等的问题，让人很头疼，今天我们就来尝试分析出问题的产生原因。通过阅读这篇wiki你将了解到:  BFC是什么（解决什么问题）？   什么样的两个元素才是外边距相邻？   什么是视觉格式化模型？   触发BFC的方法？  一、概念BFC是block formatting context，块级格式化上下文，用于布局块级盒子的一块渲染区域。Form">
+<meta name="keywords" content="CSS,BFC,IFC,布局,前端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BFC和IFC整理">
+<meta property="og:url" content="https://yourz.github.io/notes/2015/03/28/bfc/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="前言在日常开发过程中，经常遇见margin折叠、文本遮挡等的问题，让人很头疼，今天我们就来尝试分析出问题的产生原因。通过阅读这篇wiki你将了解到:  BFC是什么（解决什么问题）？   什么样的两个元素才是外边距相邻？   什么是视觉格式化模型？   触发BFC的方法？  一、概念BFC是block formatting context，块级格式化上下文，用于布局块级盒子的一块渲染区域。Form">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test01.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test02.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test03.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test04.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test05.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test06.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test07.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/bfc/test08.png">
+<meta property="og:updated_time" content="2018-03-28T12:58:34.522Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BFC和IFC整理">
+<meta name="twitter:description" content="前言在日常开发过程中，经常遇见margin折叠、文本遮挡等的问题，让人很头疼，今天我们就来尝试分析出问题的产生原因。通过阅读这篇wiki你将了解到:  BFC是什么（解决什么问题）？   什么样的两个元素才是外边距相邻？   什么是视觉格式化模型？   触发BFC的方法？  一、概念BFC是block formatting context，块级格式化上下文，用于布局块级盒子的一块渲染区域。Form">
+<meta name="twitter:image" content="https://yourz.github.io/notes/images/bfc/test01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2015/03/28/bfc/"/>
+
+
+
+
+
+  <title>BFC和IFC整理 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2015/03/28/bfc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">BFC和IFC整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-03-28T18:01:45+08:00">
+                2015-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/基础总结/" itemprop="url" rel="index">
+                    <span itemprop="name">基础总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在日常开发过程中，经常遇见margin折叠、文本遮挡等的问题，让人很头疼，今天我们就来尝试分析出问题的产生原因。<br>通过阅读这篇wiki你将了解到:</p>
+<blockquote>
+<p>BFC是什么（解决什么问题）？</p>
+</blockquote>
+<blockquote>
+<p>什么样的两个元素才是外边距相邻？</p>
+</blockquote>
+<blockquote>
+<p>什么是视觉格式化模型？</p>
+</blockquote>
+<blockquote>
+<p>触发BFC的方法？</p>
+</blockquote>
+<h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><p>BFC是block formatting context，块级格式化上下文，用于布局块级盒子的一块渲染区域。Formatting context 是 W3C CSS2.1 规范中的一个概念。它是页面中的一块渲染区域，并且有一套渲染规则，它决定了其子元素将如何定位，以及和其他元素的关系和相互作用。</p>
+<p>在IFC中，盒子水平放置，一个接着一个，从包含块的顶部开始。水平margins,borders,和padding在这些盒子中被平分。这些盒子也许通过不同的方式进行对齐:他们的底部和顶部也许被对齐，或者通过文字的基线进行对齐。矩形区域包含着来自一行的盒子叫做line box。line box的宽度由浮动情况和它的包含块决定。line box的高度由line-height的计算结果决定。一个line box总是足够高对于包含在它内的所有盒子</p>
+<h2 id="二、深入探讨"><a href="#二、深入探讨" class="headerlink" title="二、深入探讨"></a>二、深入探讨</h2><p>为了让大家更好的理解BFC，先看两个例子：</p>
+<p>例子1：</p>
+<p><img src="/notes/images/bfc/test01.png" alt="test01"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">    .left &#123;</span></span><br><span class="line"><span class="undefined">        background: red;</span></span><br><span class="line"><span class="undefined">        width: 200px;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    .left img &#123;</span></span><br><span class="line"><span class="undefined">        width: 100%;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    .right &#123;</span></span><br><span class="line"><span class="undefined">        background: yellow;</span></span><br><span class="line"><span class="undefined">        height: 200px;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"left"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"../20150706180346_3miik.jpeg"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"right"</span>&gt;</span></span><br><span class="line">    加载中... 免费发送短信下载移动客户端 发送短信 扫描二维码下载 使用手机上的二维码扫描软件扫描,直接下载百度网盘。©2017 Baidu 移动开放平台 | 服务协议</span><br><span class="line">    加载中... 免费发送短信下载移动客户端 发送短信 扫描二维码下载 使用手机上的二维码扫描软件扫描,直接下载百度网盘。©2017 Baidu 移动开放平台 | 服务协议</span><br><span class="line">    加载中... 免费发送短信下载移动客户端 发送短信 扫描二维码下载 使用手机上的二维码扫描软件扫描,直接下载百度网盘。©2017 Baidu 移动开放平台 | 服务协议</span><br><span class="line">    加载中... 免费发送短信下载移动客户端 发送短信 扫描二维码下载 使用手机上的二维码扫描软件扫描,直接下载百度网盘。©2017 Baidu 移动开放平台 | 服务协议</span><br><span class="line">    加载中... 免费发送短信下载移动客户端 发送短信 扫描二维码下载 使用手机上的二维码扫描软件扫描,直接下载百度网盘。©2017 Baidu 移动开放平台 | 服务协议</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>上述是两个正常排版的div元素，在浏览器正常的浮动。当左侧div设置了float：left之后界面变成了下图所示。</p>
+<p><img src="/notes/images/bfc/test02.png" alt="test01"></p>
+<p>上图中第二个div浮动到了原来left div所占的位置。但是发现left div占了right div的区域，被迫让right div自动缩进渲染。怎么解决这个问题呢？我们必须让right div的渲染独立出来。这就用到了我们所说的BFC.我们触发了right div的BFC之后(怎么触发我们之后会讲到)如下图：</p>
+<p><img src="/notes/images/bfc/test03.png" alt="test01"></p>
+<p>例子2：</p>
+<p><img src="/notes/images/bfc/test04.png" alt="test01"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Title<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .box &#123;</span></span><br><span class="line"><span class="undefined">            background: yellow;</span></span><br><span class="line"><span class="undefined">            border:2px solid red;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .inner-box &#123;</span></span><br><span class="line"><span class="undefined">            background: #aaa;</span></span><br><span class="line"><span class="undefined">            height: 200px;</span></span><br><span class="line"><span class="undefined">            margin: 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .inner-box2 &#123;</span></span><br><span class="line"><span class="undefined">            height: 200px;</span></span><br><span class="line"><span class="undefined">            width: 100%;</span></span><br><span class="line"><span class="undefined">            background: #00abe4;</span></span><br><span class="line"><span class="undefined">            margin: 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .inner-box3 &#123;</span></span><br><span class="line"><span class="undefined">            height: 200px;</span></span><br><span class="line"><span class="undefined">            width: 100%;</span></span><br><span class="line"><span class="undefined">            background: #4cae4c;</span></span><br><span class="line"><span class="undefined">            margin: 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner-box2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner-box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>实际上inner-box、inner-box2都存在上下边距10px。在直觉来理解蓝色和灰色div中间应该有20px的间距。但是图中却只看到了10px。这就是我们平时所说的margin折叠问题。<br>强制让inner-box出于另外一个上下文中：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Title<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .box &#123;</span></span><br><span class="line"><span class="undefined">            background: yellow;</span></span><br><span class="line"><span class="undefined">            border:2px solid red;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .inner-box &#123;</span></span><br><span class="line"><span class="undefined">            background: #aaa;</span></span><br><span class="line"><span class="undefined">            height: 200px;</span></span><br><span class="line"><span class="undefined">            margin: 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .inner-box2 &#123;</span></span><br><span class="line"><span class="undefined">            height: 200px;</span></span><br><span class="line"><span class="undefined">            width: 100%;</span></span><br><span class="line"><span class="undefined">            background: #00abe4;</span></span><br><span class="line"><span class="undefined">            margin: 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">        .inner-box3 &#123;</span></span><br><span class="line"><span class="undefined">            height: 200px;</span></span><br><span class="line"><span class="undefined">            width: 100%;</span></span><br><span class="line"><span class="undefined">            background: #4cae4c;</span></span><br><span class="line"><span class="undefined">            margin: 10px 0;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">        .bfc-box&#123;</span></span><br><span class="line"><span class="undefined">            overflow:hidden;</span></span><br><span class="line"><span class="undefined">        &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"box"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner-box2"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"bfc-box"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"inner-box"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>此时的渲染结果是：</p>
+<p><img src="/notes/images/bfc/test05.png" alt="test01"></p>
+<p>从上图可以看到篮框和灰框之间margin立刻变成了20px。<br>例子也看完了，应该对BFC是什么有一些大致的了解了。接下来回顾一写相关概念。</p>
+<h3 id="2-1-盒子模型（框模型）："><a href="#2-1-盒子模型（框模型）：" class="headerlink" title="2.1 盒子模型（框模型）："></a>2.1 盒子模型（框模型）：</h3><p>盒子模型是DOM元素的一个基本模型，是浏览器排版和渲染的基本块。在这里不对这个概念进行过多的讲解。</p>
+<p><img src="/notes/images/bfc/test06.png" alt="test01"></p>
+<h3 id="2-2-两个元素外边距相邻的定义："><a href="#2-2-两个元素外边距相邻的定义：" class="headerlink" title="2.2 两个元素外边距相邻的定义："></a>2.2 两个元素外边距相邻的定义：</h3><p>怎么样的两个盒子模型会产生margin折叠呢？这里引入一个概念就是相邻外边距，这个概念是一个进行过抽象的概念，不是实际直观的那个外边距。下面是一些定义：<br>双方都是同一个块格式化上下文中的浮动块级框。<br>双方的框边缘垂直相邻，例如下列一种形式：<br>没有行框、没有间隙、没有内边距且没有边框隔开它们（注意，某些零高度行框会为此被忽略。）<br>框的上外边距和其属于正常排版(normal flow)的第一个孩子的上外边距。<br>框的下外边距和其属于正常排版的下一个兄弟的上外边距。<br>属于正常排版的最后一个孩子的下外边距和其父亲的下外边距，如果其父亲的高度计算值为„auto‟。</p>
+<h3 id="2-3-margin折叠"><a href="#2-3-margin折叠" class="headerlink" title="2.3 margin折叠"></a>2.3 margin折叠</h3><p>两个以上的框（可能是兄弟，也可能不是）之间的相邻外边距可以被合并成一个单独的外边距。通过此方式合并的外边距被称为折叠，且产生的已合并的外边距被称为折叠外边距。水平外边距不会合并。</p>
+<p>###2.4 视觉格式化模型</p>
+<p>containing block（包含块）：是视觉格式化模型的一个重要概念，它与框模型类似，也可以理解为一个矩形，而这个矩形的作用是为它里面包含的元素提供一个参考，元素的尺寸和位置往往是由该元素所在的包含块决定的。也就是说一个元素盒子的位置和大小有时是通过相对于一个特定的长方形来计算的，这个长方形就被称之为元素的 containing block。“框的包含块”表示“框所处的包含块”，而不是其产生的包含块。每个框会被给予一个相对于其包含块的位置，但它不会被局限在其包含块内；它有可能会溢出。<br>并不是每个元素都能为其后辈元素生成一个包含块，所以每一个元素都会根据浏览器视口有一个坐标。</p>
+<h2 id="二、触发BFC"><a href="#二、触发BFC" class="headerlink" title="二、触发BFC"></a>二、触发BFC</h2><blockquote>
+<p>1.float:数值不为none的时候。float的w3c文档中描述道：</p>
+</blockquote>
+<p><img src="/notes/images/bfc/test07.png" alt="test01"></p>
+<blockquote>
+<p>2.overflow 值不为visible的时候</p>
+</blockquote>
+<blockquote>
+<p>3.position 不为relative和static</p>
+</blockquote>
+<blockquote>
+<p>4.display的值为inline-block、table-cell、table-caption</p>
+</blockquote>
+<h2 id="三、解决的问题"><a href="#三、解决的问题" class="headerlink" title="三、解决的问题"></a>三、解决的问题</h2><blockquote>
+<p>2.1 margin 折叠</p>
+</blockquote>
+<blockquote>
+<p>2.2 文字环绕、防止内容被浮动元素覆盖</p>
+</blockquote>
+<p>  <img src="/notes/images/bfc/test08.png" alt="test01"></p>
+<p>  这个div元素并没有移动，但是它却出现在浮动元素的下方。div元素的line boxes（指的是文本行）进行了移位。此处line boxes的水平收缩为浮动元素提供了空间。<br>  随着文字的增加，因为line boxes不再需要移位,最终将会环绕在浮动元素的下方，因此出现了那样的情况。这就解释了为什么即使在浮动元素存在时，段落也将紧贴在包含块的左边框上，还有为什么line boxes会缩小以容纳浮动元素。</p>
+<blockquote>
+<p>2.3 包含浮动块</p>
+</blockquote>
+<p>参考文档：</p>
+<blockquote>
+<p><a href="http://www.yangyong.me/css2-bfc%E6%A8%A1%E5%9E%8B%E5%92%8Cifc%E6%A8%A1%E5%9E%8B/" target="_blank" rel="noopener">http://www.yangyong.me/css2-bfc%E6%A8%A1%E5%9E%8B%E5%92%8Cifc%E6%A8%A1%E5%9E%8B/</a></p>
+</blockquote>
+<blockquote>
+<p><a href="https://segmentfault.com/a/1190000004466536" target="_blank" rel="noopener">https://segmentfault.com/a/1190000004466536</a></p>
+</blockquote>
+<blockquote>
+<p><a href="http://www.w3cplus.com/css/understanding-block-formatting-contexts-in-css.html" target="_blank" rel="noopener">http://www.w3cplus.com/css/understanding-block-formatting-contexts-in-css.html</a></p>
+</blockquote>
+<blockquote>
+<p><a href="http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/" target="_blank" rel="noopener">http://www.zhangxinxu.com/wordpress/2015/02/css-deep-understand-flow-bfc-column-two-auto-layout/</a></p>
+</blockquote>
+<blockquote>
+<p><a href="http://www.cnblogs.com/xiaohuochai/p/5248536.html" target="_blank" rel="noopener">http://www.cnblogs.com/xiaohuochai/p/5248536.html</a></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/CSS/" rel="tag"># CSS</a>
+          
+            <a href="/notes/tags/BFC/" rel="tag"># BFC</a>
+          
+            <a href="/notes/tags/IFC/" rel="tag"># IFC</a>
+          
+            <a href="/notes/tags/布局/" rel="tag"># 布局</a>
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2015/04/10/closure/" rel="prev" title="闭包">
+                闭包 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一、概念"><span class="nav-number">2.</span> <span class="nav-text">一、概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、深入探讨"><span class="nav-number">3.</span> <span class="nav-text">二、深入探讨</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-盒子模型（框模型）："><span class="nav-number">3.1.</span> <span class="nav-text">2.1 盒子模型（框模型）：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-两个元素外边距相邻的定义："><span class="nav-number">3.2.</span> <span class="nav-text">2.2 两个元素外边距相邻的定义：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-margin折叠"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 margin折叠</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、触发BFC"><span class="nav-number">4.</span> <span class="nav-text">二、触发BFC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、解决的问题"><span class="nav-number">5.</span> <span class="nav-text">三、解决的问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

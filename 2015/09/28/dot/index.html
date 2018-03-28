@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,Javascript,框架,渲染," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="背景前端渲染有很多框架，而且形式和内容在不断发生变化。这些演变的背后是设计模式的变化，而归根到底是功能划分逻辑的演变：MVC—&amp;gt;MVP—&amp;gt;MVVM（忽略最早混在一起的写法，那不称为模式）。近几年兴起的React、Vue、Angular等框架都属于MVVM模式，能帮我们实现界面渲染、事件绑定、路由分发等复杂功能。但在一些只需完成数据和模板简单渲染的场合，它们就显得笨重而且学习成本较高了。">
+<meta name="keywords" content="前端,Javascript,框架,渲染">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端渲染引擎doT.js解析">
+<meta property="og:url" content="https://yourz.github.io/notes/2015/09/28/dot/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="背景前端渲染有很多框架，而且形式和内容在不断发生变化。这些演变的背后是设计模式的变化，而归根到底是功能划分逻辑的演变：MVC—&amp;gt;MVP—&amp;gt;MVVM（忽略最早混在一起的写法，那不称为模式）。近几年兴起的React、Vue、Angular等框架都属于MVVM模式，能帮我们实现界面渲染、事件绑定、路由分发等复杂功能。但在一些只需完成数据和模板简单渲染的场合，它们就显得笨重而且学习成本较高了。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/dottest.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/regexp.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/with.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/jq-teml.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/jq-teml2.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/jq-teml3.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/tmpl.png">
+<meta property="og:image" content="https://yourz.github.io/notes/images/dotRead/tmpl2.png">
+<meta property="og:updated_time" content="2018-03-28T12:59:24.515Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="前端渲染引擎doT.js解析">
+<meta name="twitter:description" content="背景前端渲染有很多框架，而且形式和内容在不断发生变化。这些演变的背后是设计模式的变化，而归根到底是功能划分逻辑的演变：MVC—&amp;gt;MVP—&amp;gt;MVVM（忽略最早混在一起的写法，那不称为模式）。近几年兴起的React、Vue、Angular等框架都属于MVVM模式，能帮我们实现界面渲染、事件绑定、路由分发等复杂功能。但在一些只需完成数据和模板简单渲染的场合，它们就显得笨重而且学习成本较高了。">
+<meta name="twitter:image" content="https://yourz.github.io/notes/images/dotRead/dottest.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2015/09/28/dot/"/>
+
+
+
+
+
+  <title>前端渲染引擎doT.js解析 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2015/09/28/dot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">前端渲染引擎doT.js解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-09-28T20:13:00+08:00">
+                2015-09-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/架构相关/" itemprop="url" rel="index">
+                    <span itemprop="name">架构相关</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>前端渲染有很多框架，而且形式和内容在不断发生变化。这些演变的背后是设计模式的变化，而归根到底是功能划分逻辑的演变：MVC—&gt;MVP—&gt;MVVM（忽略最早混在一起的写法，那不称为模式）。近几年兴起的React、Vue、Angular等框架都属于MVVM模式，能帮我们实现界面渲染、事件绑定、路由分发等复杂功能。但在一些只需完成数据和模板简单渲染的场合，它们就显得笨重而且学习成本较高了。</p>
+<p>例如，在美团外卖的开发实践中，前端经常从后端接口取得长串的数据，这些数据拥有相同的样式模板，前端需要将这些数据在同一个样式模板上做重复渲染操作。</p>
+<p>解决这个问题的模板引擎有很多，doT.js（出自女程序员Laura Doktorova之手）是其中非常优秀的一个。下表将doT.js与其他同类引擎做了对比：</p>
+<table>
+<thead>
+<tr>
+<th>框架</th>
+<th>大小</th>
+<th>压缩版本大小</th>
+<th>迭代</th>
+<th>条件表达式</th>
+<th>自定义语法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>doT.js</td>
+<td>6KB</td>
+<td>4KB</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>mustache</td>
+<td>18.9 KB</td>
+<td>9.3 KB</td>
+<td>√</td>
+<td>×</td>
+<td>√</td>
+</tr>
+<tr>
+<td>Handlebars</td>
+<td>512KB</td>
+<td>62.3KB</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>artTemplate(腾讯)</td>
+<td>-</td>
+<td>5.2KB</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>BaiduTemplate(百度)</td>
+<td>9.45KB</td>
+<td>6KB</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td>jQuery-tmpl</td>
+<td>18.6KB</td>
+<td>5.98KB</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+</tbody>
+</table>
+<p>可以看出，doT.js表现突出。而且，它的性能也很优秀，本人在Mac Pro上的用Chrome浏览器（版本为：56.0.2924.87）上做100条数据10000次渲染性能测试，结果如下：</p>
+<p><img src="/notes/images/dotRead/dottest.png" alt="性能测试"></p>
+<p>从上可以看出doT.js更值得推荐，它的主要优势在于：</p>
+<ol>
+<li>小巧精简，源代码不超过两百行，6KB的大小，压缩版只有4KB；</li>
+<li>支持表达式丰富，涵盖几乎所有应用场景的表达式语句；</li>
+<li>性能优秀；</li>
+<li>不依赖第三方库。</li>
+</ol>
+<p>本文主要对doT.js的源码进行分析，探究一下这类模板引擎的实现原理。</p>
+<h2 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h2><p>如果之前用过doT.js，可以跳过此小节，doT.js使用示例如下：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;script type=<span class="string">"text/html"</span> id=<span class="string">"tpl"</span>&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">        &lt;a&gt;name:&#123;&#123;= it.name&#125;&#125;&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">        &lt;p&gt;age:&#123;&#123;= it.age&#125;&#125;&lt;/</span>p&gt;</span><br><span class="line">        &lt;p&gt;hello:&#123;&#123;= it.sayHello() &#125;&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">        &lt;select&gt;</span></span><br><span class="line"><span class="regexp">            &#123;&#123;~ it.arr:item&#125;&#125;</span></span><br><span class="line"><span class="regexp">                &lt;option &#123;&#123;?item.id == it.stringParams2&#125;&#125;selected&#123;&#123;?&#125;&#125; value="&#123;&#123;=item.id&#125;&#125;"&gt;</span></span><br><span class="line"><span class="regexp">                    &#123;&#123;=item.text&#125;&#125;</span></span><br><span class="line"><span class="regexp">                &lt;/</span>option&gt;</span><br><span class="line">            &#123;&#123;~&#125;&#125;</span><br><span class="line">        &lt;<span class="regexp">/select&gt;</span></span><br><span class="line"><span class="regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&lt;script&gt;</span></span><br><span class="line"><span class="regexp">    $("#app").html(doT.template($("#tpl").html())(&#123;</span></span><br><span class="line"><span class="regexp">        name:'stringParams1',</span></span><br><span class="line"><span class="regexp">        stringParams1:'stringParams1_value',</span></span><br><span class="line"><span class="regexp">        stringParams2:1,</span></span><br><span class="line"><span class="regexp">        arr:[&#123;id:0,text:'val1'&#125;,&#123;id:1,text:'val2'&#125;],</span></span><br><span class="line"><span class="regexp">        sayHello:function () &#123;</span></span><br><span class="line"><span class="regexp">            return this[this.name]</span></span><br><span class="line"><span class="regexp">        &#125;</span></span><br><span class="line"><span class="regexp">    &#125;));</span></span><br><span class="line"><span class="regexp">&lt;/</span>script&gt;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出doT.js的设计思路：将数据注入到预置的视图模板中渲染，返回HTML代码段，从而得到最终视图。</p>
+<p>下面是一些常用语法表达式对照表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">项目     | JavaScript语法 | 对应语法             | 案例</span><br><span class="line">------- | ------------  | ---------------------| ------------</span><br><span class="line">输出变量 | =             | &#123;&#123;= 变量名&#125;&#125;          | &#123;&#123;=it.name &#125;&#125;</span><br><span class="line">条件判断 | if            | &#123;&#123;? 条件表达式&#125;&#125;      | &#123;&#123;? i &gt; 3&#125;&#125;</span><br><span class="line">条件转折 | else/else if  | &#123;&#123;??&#125;&#125;/&#123;&#123;?? 表达式&#125;&#125; | &#123;&#123;?? i ==2&#125;&#125;</span><br><span class="line">循环遍历 | for           | &#123;&#123;~ 循环变量&#125;&#125;        | &#123;&#123;~ it.arr:item&#125;&#125;...&#123;&#123;~&#125;&#125;</span><br><span class="line">执行方法 | funcName()    | &#123;&#123;= funcName() &#125;&#125;    | &#123;&#123;= it.sayHello() &#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="源码分析及实现原理"><a href="#源码分析及实现原理" class="headerlink" title="源码分析及实现原理"></a>源码分析及实现原理</h2><p>和后端渲染不同，doT.js的渲染完全交由前端来进行，这样做主要有以下好处：</p>
+<ol>
+<li>脱离后端渲染语言，不需要依赖后端项目的启动，从而降低了开发耦合度、提升开发效率；</li>
+<li>View层渲染逻辑全在JavaScript层实现，容易维护和修改；</li>
+<li>数据通过接口得到，无需考虑后端数据模型变化，只需关心数据格式。</li>
+</ol>
+<p>doT.js源码核心：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="comment">// 去掉所有制表符、空格、换行</span></span><br><span class="line">str = (<span class="string">"var out='"</span> + (c.strip ? str.replace(<span class="regexp">/(^|\r|\n)\t* +| +\t*(\r|\n|$)/g</span>,<span class="string">" "</span>)</span><br><span class="line">         .replace(<span class="regexp">/\r|\n|\t|\/\*[\s\S]*?\*\//g</span>,<span class="string">""</span>): str)</span><br><span class="line">   .replace(<span class="regexp">/'|\\/g</span>, <span class="string">"\\$&amp;"</span>)</span><br><span class="line">   .replace(c.interpolate || skip, <span class="function"><span class="keyword">function</span>(<span class="params">m, code</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> cse.start + <span class="built_in">unescape</span>(code,c.canReturnNull) + cse.end;</span><br><span class="line">   &#125;)</span><br><span class="line">   .replace(c.encode || skip, <span class="function"><span class="keyword">function</span>(<span class="params">m, code</span>) </span>&#123;</span><br><span class="line">      needhtmlencode = <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">return</span> cse.startencode + <span class="built_in">unescape</span>(code,c.canReturnNull) + cse.end;</span><br><span class="line">   &#125;)</span><br><span class="line">   <span class="comment">// 条件判断正则匹配，包括if和else判断</span></span><br><span class="line">   .replace(c.conditional || skip, <span class="function"><span class="keyword">function</span>(<span class="params">m, elsecase, code</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> elsecase ?</span><br><span class="line">         (code ? <span class="string">"';&#125;else if("</span> + <span class="built_in">unescape</span>(code,c.canReturnNull) + <span class="string">")&#123;out+='"</span> : <span class="string">"';&#125;else&#123;out+='"</span>) :</span><br><span class="line">         (code ? <span class="string">"';if("</span> + <span class="built_in">unescape</span>(code,c.canReturnNull) + <span class="string">")&#123;out+='"</span> : <span class="string">"';&#125;out+='"</span>);</span><br><span class="line">   &#125;)</span><br><span class="line">   <span class="comment">// 循环遍历正则匹配</span></span><br><span class="line">   .replace(c.iterate || skip, <span class="function"><span class="keyword">function</span>(<span class="params">m, iterate, vname, iname</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (!iterate) <span class="keyword">return</span> <span class="string">"';&#125; &#125; out+='"</span>;</span><br><span class="line">      sid+=<span class="number">1</span>; indv=iname || <span class="string">"i"</span>+sid; iterate=<span class="built_in">unescape</span>(iterate);</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"';var arr"</span>+sid+<span class="string">"="</span>+iterate+<span class="string">";if(arr"</span>+sid+<span class="string">")&#123;var "</span>+vname+<span class="string">","</span>+indv+<span class="string">"=-1,l"</span>+sid+<span class="string">"=arr"</span>+sid+<span class="string">".length-1;while("</span>+indv+<span class="string">"&lt;l"</span>+sid+<span class="string">")&#123;"</span></span><br><span class="line">         +vname+<span class="string">"=arr"</span>+sid+<span class="string">"["</span>+indv+<span class="string">"+=1];out+='"</span>;</span><br><span class="line">   &#125;)</span><br><span class="line">   <span class="comment">// 可执行代码匹配</span></span><br><span class="line">   .replace(c.evaluate || skip, <span class="function"><span class="keyword">function</span>(<span class="params">m, code</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"';"</span> + <span class="built_in">unescape</span>(code,c.canReturnNull) + <span class="string">"out+='"</span>;</span><br><span class="line">   &#125;)</span><br><span class="line">   + <span class="string">"';return out;"</span>)</span><br><span class="line"> ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Function</span>(c.varname, str);<span class="comment">//c.varname 定义的是new Function（）返回的函数的参数名</span></span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="comment">/* istanbul ignore else */</span></span><br><span class="line">     <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="built_in">console</span> !== <span class="string">"undefined"</span>) <span class="built_in">console</span>.log(<span class="string">"Could not create a template function: "</span> + str);</span><br><span class="line">     <span class="keyword">throw</span> e;</span><br><span class="line">  &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>这段代码总结起来就是一句话：用正则表达式匹配预置模板中的语法规则，将其转换、拼接为可执行HTML代码，作为可执行语句，通过new Function()创建的新方法返回。</p>
+<h3 id="代码解析重点1：正则替换"><a href="#代码解析重点1：正则替换" class="headerlink" title="代码解析重点1：正则替换"></a>代码解析重点1：正则替换</h3><p>正则替换是doT.js的核心设计思路，本文不对正则表达式做扩充讲解，仅分析doT.js的设计思路。先来看一下doT.js中用到的正则：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">templateSettings: &#123;</span><br><span class="line">   evaluate:    /\&#123;\&#123;([\s\S]+?(\&#125;?)+)\&#125;\&#125;/g, //表达式</span><br><span class="line">   interpolate: /\&#123;\&#123;=([\s\S]+?)\&#125;\&#125;/g, // 插入的变量</span><br><span class="line">   encode:      /\&#123;\&#123;!([\s\S]+?)\&#125;\&#125;/g, // 在这里&#123;&#123;！不是用来做判断，而是对里面的代码做编码</span><br><span class="line">   use:         /\&#123;\&#123;#([\s\S]+?)\&#125;\&#125;/g,</span><br><span class="line">   useParams:   /(^|[^\w$])def(?:\.|\[[\'\"])([\w$\.]+)(?:[\'\"]\])?\s*\:\s*([\w$\.]+|\"[^\"]+\"|\'[^\']+\'|\&#123;[^\&#125;]+\&#125;)/g,</span><br><span class="line">   define:      /\&#123;\&#123;##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#\&#125;\&#125;/g,// 自定义模式</span><br><span class="line">   defineParams:/^\s*([\w$]+):([\s\S]+)/, // 自定义参数</span><br><span class="line">   conditional: /\&#123;\&#123;\?(\?)?\s*([\s\S]*?)\s*\&#125;\&#125;/g, // 条件判断</span><br><span class="line">   iterate:     /\&#123;\&#123;~\s*(?:\&#125;\&#125;|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*\&#125;\&#125;)/g, // 遍历</span><br><span class="line">   varname:   "it", // 默认变量名</span><br><span class="line">   strip:    true,</span><br><span class="line">   append:       true,</span><br><span class="line">   selfcontained: false,</span><br><span class="line">   doNotSkipEncoded: false // 是否跳过一些特殊字符</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>源码中将正则定义写到一起，这样方便了维护和管理。在早期版本的doT.js中，处理条件表达式的方式和tmpl一样，采用直接替换成可执行语句的形式，在最新版本的doT.js中，修改成仅一条正则就可以实现替换，变得更加简洁。</p>
+<p>doT.js源码中对模板中语法正则替换的流程如下：</p>
+<p><img src="/notes/images/dotRead/regexp.png" alt="渲染流程"></p>
+<h3 id="代码解析重点2：new-Function-运用"><a href="#代码解析重点2：new-Function-运用" class="headerlink" title="代码解析重点2：new Function()运用"></a>代码解析重点2：new Function()运用</h3><p>函数定义时，一般通过Function关键字，并指定一个函数名，用以调用。在JavaScript中，函数也是对象，可以通过函数对象（Function Object）来创建。正如数组对象对应的类型是Array，日期对象对应的类型是Date一样，如下所示：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> funcName = <span class="keyword">new</span> <span class="built_in">Function</span>(p1,p2,...,pn,body);</span><br></pre></td></tr></table></figure></p>
+<p>参数的数据类型都是字符串，p1到pn表示所创建函数的参数名称列表，body表示所创建函数的函数体语句，funcName就是所创建函数的名称（可以不指定任何参数创建一个匿名函数）。</p>
+<p>下面的定义是等价的。</p>
+<p>例如：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 一般函数定义方式</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">func1</span>(<span class="params">a,b</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a+b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 参数是一个字符串通过逗号分隔</span></span><br><span class="line"><span class="keyword">var</span> func2 = <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">'a,b'</span>,<span class="string">'return a+b'</span>);</span><br><span class="line"><span class="comment">// 参数是多个字符串</span></span><br><span class="line"><span class="keyword">var</span> func3 = <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'return a+b'</span>);</span><br><span class="line"><span class="comment">// 一样的调用方式</span></span><br><span class="line"><span class="built_in">console</span>.log(func1(<span class="number">1</span>,<span class="number">2</span>));</span><br><span class="line"><span class="built_in">console</span>.log(func2(<span class="number">2</span>,<span class="number">3</span>));</span><br><span class="line"><span class="built_in">console</span>.log(func3(<span class="number">1</span>,<span class="number">3</span>));</span><br><span class="line"><span class="comment">// 输出</span></span><br><span class="line"><span class="number">3</span> <span class="comment">// func1</span></span><br><span class="line"><span class="number">5</span> <span class="comment">// func2</span></span><br><span class="line"><span class="number">4</span> <span class="comment">// func3</span></span><br></pre></td></tr></table></figure></p>
+<p>从上面的代码中可以看出，Function的最后一个参数，被转换为可执行代码，类似eval的功能。eval执行时存在浏览器性能下降、调试困难以及可能引发XSS（跨站）攻击等问题，因此不推荐使用eval执行字符串代码，new Function()恰好解决了这个问题。回过头来看doT代码中的”new Function(c.varname, str)”，就不难理解varname是传入可执行字符串str的变量。</p>
+<p>具体关于new Fcuntion的定义和用法，详细请阅读<a href="http://www.cnblogs.com/yuzhongwusan/archive/2012/04/09/2438569.html" target="_blank" rel="noopener">Function详细介绍</a>。</p>
+<h2 id="性能之因"><a href="#性能之因" class="headerlink" title="性能之因"></a>性能之因</h2><p>读到这里可能会产生一个疑问：doT.js的性能为什么在众多引擎如此突出？通过阅读其他引擎源代码，发现了它们核心代码段中都存在这样那样的问题。</p>
+<h4 id="jQuery-tmpl"><a href="#jQuery-tmpl" class="headerlink" title="jQuery-tmpl"></a>jQuery-tmpl</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildTmplFn</span>(<span class="params"> markup </span>) </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">"jQuery"</span>,<span class="string">"$item"</span>,</span><br><span class="line">			<span class="comment">// Use the variable __ to hold a string array while building the compiled template. (See https://github.com/jquery/jquery-tmpl/issues#issue/10).</span></span><br><span class="line">			<span class="string">"var $=jQuery,call,__=[],$data=$item.data;"</span> +</span><br><span class="line"></span><br><span class="line">			<span class="comment">// Introduce the data as local variables using with()&#123;&#125;</span></span><br><span class="line">			<span class="string">"with($data)&#123;__.push('"</span> +</span><br><span class="line"></span><br><span class="line">			<span class="comment">// Convert the template into pure JavaScript</span></span><br><span class="line">			jQuery.trim(markup)</span><br><span class="line">				.replace( <span class="regexp">/([\\'])/g</span>, <span class="string">"\\$1"</span> )</span><br><span class="line">				.replace( <span class="regexp">/[\r\t\n]/g</span>, <span class="string">" "</span> )</span><br><span class="line">				.replace( <span class="regexp">/\$\&#123;([^\&#125;]*)\&#125;/g</span>, <span class="string">"&#123;&#123;= $1&#125;&#125;"</span> )</span><br><span class="line">				.replace( <span class="regexp">/\&#123;\&#123;(\/?)(\w+|.)(?:\(((?:[^\&#125;]|\&#125;(?!\&#125;))*?)?\))?(?:\s+(.*?)?)?(\(((?:[^\&#125;]|\&#125;(?!\&#125;))*?)\))?\s*\&#125;\&#125;/g</span>,</span><br><span class="line">				<span class="function"><span class="keyword">function</span>(<span class="params"> all, slash, type, fnargs, target, parens, args </span>) </span>&#123;</span><br><span class="line">					<span class="comment">//省略部分模板替换语句,若要阅读全部代码请访问:https://github.com/BorisMoore/jquery-tmpl</span></span><br><span class="line">				&#125;) +</span><br><span class="line">			<span class="string">"');&#125;return __;"</span></span><br><span class="line">		);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中看到，jQuery-teml同样使用了new Function()的方式编译模板，但是在性能对比中jQuery-teml性能相比doT.js相差甚远，出现性能瓶颈的关键在于with语句的使用。</p>
+<p>with语句为什么对性能有这么大的影响？我们来看下面的代码：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> datas = &#123;<span class="attr">persons</span>:[<span class="string">'李明'</span>,<span class="string">'小红'</span>,<span class="string">'赵四'</span>,<span class="string">'王五'</span>,<span class="string">'张三'</span>,<span class="string">'孙行者'</span>,<span class="string">'马婆子'</span>],<span class="attr">gifts</span>:[<span class="string">'平民'</span>,<span class="string">'巫师'</span>,<span class="string">'狼'</span>,<span class="string">'猎人'</span>,<span class="string">'先知'</span>]&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">go</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">with</span>(datas)&#123;</span><br><span class="line">        <span class="keyword">var</span> personIndex = <span class="number">0</span>,giftIndex = <span class="number">0</span>,i=<span class="number">100000</span>;</span><br><span class="line">        <span class="keyword">while</span>(i)&#123;</span><br><span class="line">            personIndex = <span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random()*persons.length);</span><br><span class="line">            giftIndex = <span class="built_in">Math</span>.floor(<span class="built_in">Math</span>.random()*gifts.length)</span><br><span class="line">            <span class="built_in">console</span>.log(persons[personIndex] +<span class="string">'得到了新的身份:'</span>+ gifts[giftIndex]);</span><br><span class="line">            i--;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码中使用了一个with表达式，为了避免多次从datas中取变量而使用了with语句。这看起来似乎提升了效率，但却产生了一个性能问题：在JavaScript中执行方法时会产生一个执行上下文，这个执行上下文持有该方法作用域链，主要用于标识符解析。当代码流执行到一个with表达式时，运行期上下文的作用域链被临时改变了，一个新的可变对象将被创建，它包含指定对象的所有属性。此对象被插入到作用域链的最前端，意味着现在函数的所有局部变量都被推入第二个作用域链对象中，这样访问datas的属性非常快，但是访问局部变量的速度却变慢了，所以访问代价更高了，如下图所示。</p>
+<p><img src="/notes/images/dotRead/with.png" alt="with"></p>
+<p>这个插件在GitHub上面介绍时，作者Boris Moore着重强调两点设计思路：</p>
+<ol>
+<li>模板缓存，在模板重复使用时，直接使用内存中缓存的模板。在本文作者看来，这是一个鸡肋的功能，在实际使用中，无论是直接写在String中的模板还是从Dom获取的模板都会以变量的形式存放在内存中，变量使用得当，在页面整个生命周期内都能取到这个模板。通过源码分析之后发现jQuery-tmpl的模板缓存并不是对模板编译结果进行缓存，并且会造成多次执行渲染时产生多次编译，再加上代码with性能消耗，严重拖慢整个渲染过程。</li>
+<li>模板标记，可以从缓存模板中取出对应子节点。这是一个不错的设计思路，可以实现数据改变只重新渲染局部界面的功能。但是我觉得：模板将渲染结果交给开发者，并渲染到界面指定位置之后，模板引擎的工作就应该结束了，剩下的对节点操作应该灵活的掌握在开发者手上。</li>
+</ol>
+<p>不改变原来设计思路基础之上，尝试对源代码进行性能提升。</p>
+<p>先保留提升前性能作为对比：</p>
+<p><img src="/notes/images/dotRead/jq-teml.png" alt="性能提升"></p>
+<p>首先来我们做第一次性能提升，移除源码中with语句。</p>
+<p>第一次提升后：<br><img src="/notes/images/dotRead/jq-teml2.png" alt="性能提升2"></p>
+<p>接下来第二部提升，落实Boris Moore设计理念中的模板缓存：</p>
+<p><img src="/notes/images/dotRead/jq-teml3.png" alt="性能提升3"></p>
+<p>优化后的这一部分代码段被我们修改成了：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildTmplFn</span>(<span class="params"> markup </span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(!compledStr)&#123;</span><br><span class="line">		<span class="comment">// Convert the template into pure JavaScript</span></span><br><span class="line">		compledStr = jQuery.trim(markup)</span><br><span class="line">			.replace( <span class="regexp">/([\\'])/g</span>, <span class="string">"\\$1"</span> )</span><br><span class="line">			.replace( <span class="regexp">/[\r\t\n]/g</span>, <span class="string">" "</span> )</span><br><span class="line">			.replace( <span class="regexp">/\$\&#123;([^\&#125;]*)\&#125;/g</span>, <span class="string">"&#123;&#123;= $1&#125;&#125;"</span> )</span><br><span class="line">			.replace( <span class="regexp">/\&#123;\&#123;(\/?)(\w+|.)(?:\(((?:[^\&#125;]|\&#125;(?!\&#125;))*?)?\))?(?:\s+(.*?)?)?(\(((?:[^\&#125;]|\&#125;(?!\&#125;))*?)\))?\s*\&#125;\&#125;/g</span>,</span><br><span class="line">				<span class="comment">//省略部分模板替换语句</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">"jQuery"</span>,<span class="string">"$item"</span>,</span><br><span class="line">		<span class="comment">// Use the variable __ to hold a string array while building the compiled template. (See https://github.com/jquery/jquery-tmpl/issues#issue/10).</span></span><br><span class="line">		<span class="string">"var $=jQuery,call,__=[],$data=$item.data;"</span> +</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Introduce the data as local variables using with()&#123;&#125;</span></span><br><span class="line">		<span class="string">"__.push('"</span> + compledStr +</span><br><span class="line">		<span class="string">"');return __;"</span></span><br><span class="line">	)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在doT.js源码中没有用到with这类消耗性能的语句，与此同时doT.js选择先将模板编译结果返回给开发者，这样如要重复多次使用同一模板进行渲染便不会反复编译。</p>
+<h4 id="仅25行的模板：tmpl"><a href="#仅25行的模板：tmpl" class="headerlink" title="仅25行的模板：tmpl"></a>仅25行的模板：tmpl</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> cache = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.tmpl =  <span class="function"><span class="keyword">function</span> (<span class="params">str, data</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> fn = !<span class="regexp">/\W/</span>.test(str) ?</span><br><span class="line">	  cache[str] = cache[str] ||</span><br><span class="line">		tmpl(<span class="built_in">document</span>.getElementById(str).innerHTML) :</span><br><span class="line"></span><br><span class="line">	  <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">"obj"</span>,</span><br><span class="line">		<span class="string">"var p=[],print=function()&#123;p.push.apply(p,arguments);&#125;;"</span> +</span><br><span class="line">		<span class="string">"with(obj)&#123;p.push('"</span> +</span><br><span class="line"></span><br><span class="line">		str</span><br><span class="line">		  .replace(<span class="regexp">/[\r\t\n]/g</span>, <span class="string">" "</span>)</span><br><span class="line">		  .split(<span class="string">"&lt;%"</span>).join(<span class="string">"\t"</span>)</span><br><span class="line">		  .replace(<span class="regexp">/((^|%&gt;)[^\t]*)'/g</span>, <span class="string">"$1\r"</span>)</span><br><span class="line">		  .replace(<span class="regexp">/\t=(.*?)%&gt;/g</span>, <span class="string">"',$1,'"</span>)</span><br><span class="line">		  .split(<span class="string">"\t"</span>).join(<span class="string">"');"</span>)</span><br><span class="line">		  .split(<span class="string">"%&gt;"</span>).join(<span class="string">"p.push('"</span>)</span><br><span class="line">		  .split(<span class="string">"\r"</span>).join(<span class="string">"\\'"</span>)</span><br><span class="line">	  + <span class="string">"');&#125;return p.join('');"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> data ? fn( data ) : fn;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<p>阅读这段代码会惊奇的发现，它更像是baiduTemplate精简版。相比baiduTemplate而言，它移除了baiduTemplate的自定义语法标签的功能，使得代码更加精简，也避开了替换用户语法标签而带来的性能消耗。对于doT.js来说，性能问题的关键是with语句。</p>
+<p>综合上述我对tmpl的源码进行移除with语句改造：</p>
+<p>改造之前性能：</p>
+<p><img src="/notes/images/dotRead/tmpl.png" alt="tmpl性能提升"></p>
+<p>改造之后性能：</p>
+<p><img src="/notes/images/dotRead/tmpl2.png" alt="tmpl性能提升2"></p>
+<p>如果读者对性能对比源码比较感兴趣可以访问 <a href="https://github.com/chen2009277025/TemplateTest" target="_blank" rel="noopener">https://github.com/chen2009277025/TemplateTest</a> 。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过对doT.js源码的解读，我们发现：</p>
+<ol>
+<li>doT.js的条件判断语法标签不直观。当开发者在使用过程中条件判断嵌套过多时，很难找到对应的结束语法符号，开发者需要自己严格规范代码书写，否则会给开发和维护带来困难。</li>
+<li>doT.js限制开发者自定义语法标签，相比较之下baiduTemplate提供可自定义标签的功能，而baiduTemplate的性能瓶颈恰好是提供自定义语法标签的功能。</li>
+</ol>
+<p>很多解决我们问题的插件的代码往往简单明了，那些庞大的插件反而存在负面影响或无用功能。技术领域有一个软件设计范式：“约定大于配置”，旨在减少软件开发人员需要做决定的数量，做到简单而又不失灵活。在插件编写过程中开发者应多注意使用场景和性能的有机结合，使用恰当的语法，尽可能减少开发者的配置，不求迎合各个场景。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/Javascript/" rel="tag"># Javascript</a>
+          
+            <a href="/notes/tags/框架/" rel="tag"># 框架</a>
+          
+            <a href="/notes/tags/渲染/" rel="tag"># 渲染</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2015/08/11/js-extend/" rel="next" title="JS继承浅析">
+                <i class="fa fa-chevron-left"></i> JS继承浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2016/01/28/memory-leak/" rel="prev" title="JavaScript垃圾回收与内存泄漏">
+                JavaScript垃圾回收与内存泄漏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用"><span class="nav-number">2.</span> <span class="nav-text">如何使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析及实现原理"><span class="nav-number">3.</span> <span class="nav-text">源码分析及实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码解析重点1：正则替换"><span class="nav-number">3.1.</span> <span class="nav-text">代码解析重点1：正则替换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码解析重点2：new-Function-运用"><span class="nav-number">3.2.</span> <span class="nav-text">代码解析重点2：new Function()运用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能之因"><span class="nav-number">4.</span> <span class="nav-text">性能之因</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#jQuery-tmpl"><span class="nav-number">4.0.1.</span> <span class="nav-text">jQuery-tmpl</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#仅25行的模板：tmpl"><span class="nav-number">4.0.2.</span> <span class="nav-text">仅25行的模板：tmpl</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

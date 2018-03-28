@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/notes/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/notes/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/notes/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/notes/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="前端,HTML,DOM," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/notes/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="目录  继承关系 基础类型 EventTarget Node Element HTMLElement    继承关系EventTarget =&amp;gt; Node =&amp;gt; Element =&amp;gt; HTMLElement =&amp;gt; HTMLAnchorElement =&amp;gt; 实例化HTMLAnchorElement 基础类型EventTarget   方法 说明 备注 兼容性     E">
+<meta name="keywords" content="前端,HTML,DOM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dom元素继承">
+<meta property="og:url" content="https://yourz.github.io/notes/2015/05/01/dom-inherit/index.html">
+<meta property="og:site_name" content="Yourz Notes">
+<meta property="og:description" content="目录  继承关系 基础类型 EventTarget Node Element HTMLElement    继承关系EventTarget =&amp;gt; Node =&amp;gt; Element =&amp;gt; HTMLElement =&amp;gt; HTMLAnchorElement =&amp;gt; 实例化HTMLAnchorElement 基础类型EventTarget   方法 说明 备注 兼容性     E">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-28T12:59:06.534Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dom元素继承">
+<meta name="twitter:description" content="目录  继承关系 基础类型 EventTarget Node Element HTMLElement    继承关系EventTarget =&amp;gt; Node =&amp;gt; Element =&amp;gt; HTMLElement =&amp;gt; HTMLAnchorElement =&amp;gt; 实例化HTMLAnchorElement 基础类型EventTarget   方法 说明 备注 兼容性     E">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/notes/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yourz.github.io/notes/2015/05/01/dom-inherit/"/>
+
+
+
+
+
+  <title>dom元素继承 | Yourz Notes</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/notes/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yourz Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/notes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/notes/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/notes/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/notes/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/notes/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yourz.github.io/notes/notes/2015/05/01/dom-inherit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yourz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/notes/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yourz Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">dom元素继承</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2015-05-01T18:17:00+08:00">
+                2015-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/notes/categories/基础总结/" itemprop="url" rel="index">
+                    <span itemprop="name">基础总结</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>目录</p>
+<ul>
+<li><a href="#继承关系">继承关系</a></li>
+<li><a href="#基础类型">基础类型</a><ul>
+<li><a href="#eventtarget">EventTarget</a></li>
+<li><a href="#node">Node</a></li>
+<li><a href="#element">Element</a></li>
+<li><a href="#htmlelement">HTMLElement</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="继承关系"><a href="#继承关系" class="headerlink" title="继承关系"></a>继承关系</h2><p>EventTarget =&gt; Node =&gt; Element =&gt; HTMLElement =&gt; HTMLAnchorElement =&gt; 实例化HTMLAnchorElement</p>
+<h2 id="基础类型"><a href="#基础类型" class="headerlink" title="基础类型"></a>基础类型</h2><h3 id="EventTarget"><a href="#EventTarget" class="headerlink" title="EventTarget"></a>EventTarget</h3><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+<th>备注</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EventTarget.addEventListener(type, listener[, useCapture])</td>
+<td>注册事件监听</td>
+<td>参数<br>type<br>事件类型<br>listener<br>监听函数<br>useCapture<br>布尔值，指定事件是否在捕获或冒泡阶段执行。<br>true - 事件句柄在捕获阶段执行<br>false- 默认。事件句柄在冒泡阶段执行。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>EventTarget.attachEvent(eventNameWithOn, callback)</td>
+<td>注册事件监听</td>
+<td>参数<br>eventNameWithOn<br>事件类型名称带on<br>callback<br>监听函数</td>
+<td>非标准，ie6-8</td>
+</tr>
+<tr>
+<td>EventTarget.removeEventListener(type, listener[, useCapture])</td>
+<td>移除事件监听</td>
+<td>参数<br>type<br>事件类型<br>listener<br>监听函数<br>useCapture<br>布尔值，指定事件是否在捕获或冒泡阶段执行。<br>true - 事件句柄在捕获阶段执行<br>false- 默认。事件句柄在冒泡阶段执行。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>EventTarget.detachEvent(eventNameWithOn, callback)</td>
+<td>移除事件监听</td>
+<td>参数<br>eventNameWithOn<br>事件类型名称带on<br>callback<br>监听函数</td>
+<td>非标准，ie6-8</td>
+</tr>
+<tr>
+<td>EventTarget.dispatchEvent(event)</td>
+<td>触发事件</td>
+<td>参数<br>event<br>事件对象</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>EventTarget.fireEvent(eventNameWithOn[, event])</td>
+<td>触发事件</td>
+<td>参数<br>eventNameWithOn<br>事件类型名称带on<br>event<br>事件对象</td>
+<td>非标准，ie6-8</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Node"><a href="#Node" class="headerlink" title="Node"></a>Node</h3><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.childNodes</td>
+<td>返回节点的子节点的数组。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.firstChild</td>
+<td>返回节点的第一个子节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.lastChild</td>
+<td>返回节点的最后一个子节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.previousSibling</td>
+<td>返回位于相同节点树层级的前一个节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.nextSibling</td>
+<td>返回位于相同节点树层级的下一个节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.parentNode</td>
+<td>返回节点的父节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.parentElement</td>
+<td>返回节点的父元素节点,如果该元素没有父节点,或者父节点不是一个元素节点.则 返回null。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.nodeName</td>
+<td>返回节点的名称。大写</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.nodeType</td>
+<td>返回节点的类型。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.nodeValue</td>
+<td>设置或返回节点的值。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.textContent</td>
+<td>设置或返回节点及其后代的文本内容。返回其他文本一样返回行内的样式和脚本代码。</td>
+<td>ie9-11</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.ownerDocument</td>
+<td>返回节点的根节点。 <html> 节点</html></td>
+<td></td>
+</tr>
+<tr>
+<td>Node.baseURI</td>
+<td>返回节点的绝对基准 URI。页面的路径</td>
+<td>ie无 </td>
+</tr>
+<tr>
+<td>Node.localName</td>
+<td>返回不带命名空间前缀的节点名称。</td>
+<td>ie9-11 </td>
+</tr>
+<tr>
+<td>Node.namespaceURI</td>
+<td>返回命名空间的 URI。</td>
+<td>ie9-11 </td>
+</tr>
+<tr>
+<td>Node.prefix</td>
+<td>返回选定节点的命名空间前缀。xml有</td>
+<td>ie9-11 </td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+<th>备注</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.appendChild(node)</td>
+<td>向元素添加新的子节点，作为最后一个子节点。</td>
+<td>参数<br>node<br>你要添加的节点对象。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.insertBefore(newnode,existingnode)</td>
+<td>在指定的已有的子节点之前插入新节点。</td>
+<td>参数<br>newnode<br>你想要插入的节点<br>existingnode<br>要添加新的节点前的子节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.removeChild(node)</td>
+<td>从元素中移除子节点。</td>
+<td>参数<br>node<br>想要删除的子节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.replaceChild(newnode,oldnode)</td>
+<td>替换元素中的子节点。</td>
+<td>参数<br>newnode<br>你要插入的节点对象。 <br>oldnode<br>你要移除的节点对象。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.cloneNode(deep)</td>
+<td>克隆某个元素。</td>
+<td>参数<br>deep<br>如果传递给它的参数是 true，它还将递归复制当前节点的所有子孙节点。否则，它只复制当前节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Node.hasChildNodes()</td>
+<td>如果元素拥有子节点，则返回 true，否则 false。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Node.normalize()</td>
+<td>合并元素中相邻的文本节点，并移除空的文本节点。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Node.contains(node)</td>
+<td>返回一个布尔值来表示是否传入的节点是，该节点的子节点。</td>
+<td>参数<br>node<br>想要查询的子节点。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Node.compareDocumentPosition(node)</td>
+<td>比较两个元素的文档位置。</td>
+<td>参数<br>node<br>你要比较的节点对象。<br>返回值<br>1：没有关系，这两个节点不属于同一个文档。<br>2：element 位于 node 后。<br>4：element 位于 node 前。<br>8：element 位于 node 内。<br>16：node 位于 element 内。<br>32: 没有关系的，或是两个节点在同一元素的两个属性。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Node.isEqualNode(node)</td>
+<td>检查两个元素是否相等。</td>
+<td>参数<br>node<br>比较的另一个节点。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Node.isDefaultNamespace(namespaceURI)</td>
+<td>如果指定的 namespaceURI 是当前节点默认的，则返回 true，否则返回 false。</td>
+<td>参数<br>namespaceURI<br>你想要检查的命名空间URI。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Node.lookupPrefix(namespaceURI)</td>
+<td>返回在节点上匹配指定的命名空间的前缀。</td>
+<td>参数<br>namespaceURI<br>节点的命名空间 URI。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Node.lookupNamespaceURI(prefix)</td>
+<td>返回匹配某个节点上所指定的前缀的命名空间 URI。</td>
+<td>参数<br>prefix<br>节点的命名空间前缀。</td>
+<td>ie9-11</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Element"><a href="#Element" class="headerlink" title="Element"></a>Element</h3><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Element.id</td>
+<td>设置或返回元素的 id。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.tagName</td>
+<td>返回元素的标签名。大写</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.className</td>
+<td>设置或返回元素的 class 属性。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.classList</td>
+<td>设置或返回元素的 class 集合。</td>
+<td>ie10-11</td>
+</tr>
+<tr>
+<td>Element.attributes</td>
+<td>返回的属性数组。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.innerHTML</td>
+<td>设置或返回元素内的标签内容。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.outerHTML</td>
+<td>设置或返回元素的标签内容。包括元素本身</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.children</td>
+<td>返回子元素集合。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.clientHeight</td>
+<td>返回元素的可见高度。元素内容及其内边距所占据的空间大小。</td>
+<td>body 时，与 scrollHeight 相同</td>
+</tr>
+<tr>
+<td>Element.clientWidth</td>
+<td>返回元素的可见宽度。元素内容及其内边距所占据的空间大小。</td>
+<td>body 时，与 scrollWidth 相同</td>
+</tr>
+<tr>
+<td>Element.clientLeft</td>
+<td>返回元素的左边框厚度。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.clientTop</td>
+<td>返回元素的上边框厚度。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.scrollHeight</td>
+<td>返回内元素的实际高度。元素内容及其内边距所占据的空间大小，包括滚动条隐藏的。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.scrollWidth</td>
+<td>返回内元素的实际宽度。元素内容及其内边距所占据的空间大小，包括滚动条隐藏的。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.scrollLeft</td>
+<td>返回内部上部分已隐藏的高度。</td>
+<td>documentElement–firefox，ie7-11<br>body–chrome<br>ie兼容模式都支持</td>
+</tr>
+<tr>
+<td>Element.scrollTop</td>
+<td>返回内部左部分已隐藏的宽度。</td>
+<td>documentElement–firefox，ie7-11<br>body–chrome<br>ie兼容模式都支持</td>
+</tr>
+<tr>
+<td>Element.firstElementChild</td>
+<td>返回第一个子元素。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.lastElementChild</td>
+<td>返回最后一个子元素。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.nextElementSibling</td>
+<td>返回下一个兄弟子元素。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.previousElementSibling</td>
+<td>返回上一个兄弟子元素。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.childElementCount</td>
+<td>返回子元素的个数。</td>
+<td>ie9-11</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+<th>备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Element.getBoundingClientRect()</td>
+<td>返回元素的大小及其相对于浏览器的位置。包括边框和内边距</td>
+<td>返回相对于浏览器的位置<br>width和height包括padding和border</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.getClientRects()</td>
+<td>返回元素的大小及其相对于浏览器的位置的集合。</td>
+<td>返回相对于浏览器的位置<br>width和height包括padding和border</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.scrollIntoView(alignToTop)</td>
+<td>让当前的元素滚动到浏览器窗口的可视区域内。</td>
+<td>参数<br>alignToTop<br>如果为true，元素的顶端将和其所在滚动区的可视区域的顶端对齐。<br>如果为false，元素的底端将和其所在滚动区的可视区域的底端对齐。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.insertAdjacentHTML(position, text)</td>
+<td>将指定的文本解析为 HTML 或 XML，然后将结果节点插入到 DOM 树中的指定位置处。</td>
+<td>参数<br>position<br>位置<br>beforebegin在 element 元素的前面。<br>afterbegin在 element 元素的第一个子节点前面。<br>beforeend在 element 元素的最后一个子节点后面。<br>afterend在 element 元素的后面。<br>text <br>字符串，会被解析成 HTML 或 XML。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.getElementsByTagName(tagname)</td>
+<td>返回拥有指定标签名的所有子元素的集合。</td>
+<td>参数<br>tagname<br>你想获取自元素的标签名。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.getElementsByClassName(classname)</td>
+<td>返回文档中所有指定类名的元素集合，作为 NodeList 对象。</td>
+<td>参数<br>classname<br>你需要获取的元素类名。 <br>多个类名使用空格分隔，如 test demo。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.querySelector(selectors)</td>
+<td>通过css条件选择第一个符合条件的dom节点</td>
+<td>参数<br>selectors<br>指定一个或多个匹配元素的 CSS 选择器。 可以使用它们的 id, 类, 类型, 属性, 属性值等来选取元素。<br>对于多个选择器，使用逗号隔开，返回一个匹配的元素。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.querySelectorAll(selectors)</td>
+<td>通过css条件选择所有符合条件的dom节点</td>
+<td>参数<br>selectors<br>指定一个或多个匹配元素的 CSS 选择器。 可以使用它们的 id, 类, 类型, 属性, 属性值等来选取元素。<br>对于多个选择器，使用逗号隔开，返回一个匹配的元素。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.matches(selectors)</td>
+<td>如果当前元素能被指定的css选择器查找到，则返回true,否则返回false。</td>
+<td>参数<br>selectors<br>指定一个或多个匹配元素的 CSS 选择器。 可以使用它们的 id, 类, 类型, 属性, 属性值等来选取元素。<br>对于多个选择器，使用逗号隔开，返回一个匹配的元素。</td>
+<td>ie无</td>
+</tr>
+<tr>
+<td>Element.getAttribute(attributename)</td>
+<td>返回元素的指定属性值。</td>
+<td>参数<br>attributename<br>你想获取的属性值的属性名。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.setAttribute(attributename,attributevalue)</td>
+<td>把指定属性设置或更改为指定值。</td>
+<td>参数<br>attributename<br>你要添加的属性名称。 <br>attributevalue<br>你要添加的属性值。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.removeAttribute(attributename)</td>
+<td>从元素中移除指定属性。</td>
+<td>参数<br>attributename<br>你想删除的属性值的属性名。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.hasAttribute(attributename)</td>
+<td>如果元素拥有指定属性，则返回true，否则返回 false。</td>
+<td>参数<br>attributename<br>你要检查的属性名。</td>
+<td>ie8-11</td>
+</tr>
+<tr>
+<td>Element.getAttributeNode(attributename)</td>
+<td>返回元素指定的属性节点。</td>
+<td>参数<br>attributenode<br>你想获取的属性节点的属性名。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.setAttributeNode(attributenode)</td>
+<td>设置或更改指定属性节点。</td>
+<td>参数<br>attributenode<br>你要添加的属性节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.removeAttributeNode(attributenode)</td>
+<td>移除指定的属性节点，并返回被移除的节点。</td>
+<td>参数<br>attributenode<br>你想移除的属性节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.getElementsByTagNameNS(ns,tagname)</td>
+<td>返回拥有指定标签名的所有子元素的集合，通过命名空间 URI。</td>
+<td>参数<br>ns<br>规定从中获取属性值的命名空间 URI。<br>tagname<br>你想获取自元素的标签名。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.getAttributeNS(ns,name)</td>
+<td>返回元素的指定属性值，通过命名空间 URI。</td>
+<td>参数<br>ns<br>规定从中获取属性值的命名空间 URI。 <br>name<br>规定从中获取属性值的属性。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.setAttributeNS(ns,attributename,attributevalue)</td>
+<td>把指定属性设置或更改为指定值，通过命名空间 URI。</td>
+<td>参数<br>ns<br>规定从中获取属性值的命名空间 URI。 <br>attributename<br>你要添加的属性名称。 <br>attributevalue<br>你要添加的属性值。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.hasAttributeNS(ns,attributename)</td>
+<td>如果元素拥有指定属性，则返回true，否则返回 false，通过命名空间 URI。</td>
+<td>参数<br>ns<br>规定从中获取属性值的命名空间 URI。 <br>attributename<br>你要检查的属性名。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.getAttributeNodeNS(ns,name)</td>
+<td>返回元素指定的属性节点，通过命名空间 URI。</td>
+<td>参数<br>ns<br>规定从中获取属性值的命名空间 URI。 <br>name<br>规定从中获取属性值的属性。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.setAttributeNodeNS(ns,attributenode)</td>
+<td>设置或更改指定属性节点，通过命名空间 URI。</td>
+<td>参数<br>ns<br>规定从中获取属性值的命名空间 URI。 <br>attributenode<br>你要添加的属性节点。</td>
+<td>ie9-11</td>
+</tr>
+<tr>
+<td>Element.removeAttributeNodeNS(ns,attributenode)</td>
+<td>移除指定的属性节点，并返回被移除的节点，通过命名空间 URI。</td>
+<td>参数<br>attributenode<br>你想移除的属性节点。</td>
+<td></td>
+</tr>
+<tr>
+<td>Element.closest(selectors)</td>
+<td>获取匹配特定选择器且离当前元素最近的祖先元素（也可以是当前元素本身）。如果匹配不到，则返回 null。</td>
+<td>参数<br>selectors<br>选择器</td>
+<td>ie无</td>
+</tr>
+<tr>
+<td>Element.remove()</td>
+<td>将自己从所在的 DOM 树中删除。</td>
+<td></td>
+<td>ie无</td>
+</tr>
+<tr>
+<td>Element.setCapture(retargetToElement)</td>
+<td>在处理一个 mousedown 事件过程中调用这个方法来把全部的鼠标事件重新定向到这个元素，直到鼠标按钮被释放或者 document.releaseCapture() 被调用。</td>
+<td>参数<br>retargetToElement<br>如果被设置为 true, 所有事件被直接定向到这个元素; 如果是 false, 事件也可以在这个元素的子元素上触发。</td>
+<td>chrome无</td>
+</tr>
+<tr>
+<td>Element.scrollIntoViewIfNeeded(alignCenter)</td>
+<td>只在当前元素在视口中不可见的情况下，才滚<br>动浏览器窗口或容器元素，最终让它可见。</td>
+<td>参数<br>alignCenter<br>对其位置<br>true<br>则表示尽量将元素显示在视口中部（垂直方向）。<br>false<br>移动最小的距离对其底部或顶部</td>
+<td>只chrome</td>
+</tr>
+</tbody>
+</table>
+<h3 id="HTMLElement"><a href="#HTMLElement" class="headerlink" title="HTMLElement"></a>HTMLElement</h3><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTMLElement.accessKey</td>
+<td>设置或返回元素的快捷键。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.style</td>
+<td>设置或返回元素的 CSSStyleDeclaration 对象。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.title</td>
+<td>设置或返回元素的 title 属性。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.tabIndex</td>
+<td>设置或返回元素的 tab 键控制次序。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.dir</td>
+<td>设置或返回元素的文本方向。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.lang</td>
+<td>设置或返回元素的语言代码。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.spellcheck</td>
+<td>设置或返回是否对元素内容进行拼写检查。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.contentEditable</td>
+<td>设置或返回元素的可编辑状态。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.isContentEditable</td>
+<td>返回元素的内容是否可被编辑。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.offsetParent</td>
+<td>返回元素的偏移容器。(父集有CSS定位属性的元素或body元素)</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.offsetHeight</td>
+<td>返回元素的高度。包括border</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.offsetWidth</td>
+<td>返回元素的宽度。包括border</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.offsetLeft</td>
+<td>返回元素的水平偏移位置。元素的左外边框至父级元素的左内边框之间的像素距离。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.offsetTop</td>
+<td>返回元素的垂直偏移位置。元素的上外边框至父级元素的上内边框之间的像素距离。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.innerText</td>
+<td>设置或返回元素的纯文本内容。不包括标签，会忽略行内的样式和脚本</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.outerText</td>
+<td>设置或返回元素的纯文本内容。包括标签，设置的时候标签会删除，返回时同innerText。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.dataset</td>
+<td>返回元素的自定义data特性(data-*)。</td>
+<td>ie11</td>
+</tr>
+<tr>
+<td>HTMLElement.hidden</td>
+<td>设置或返回元素是否隐藏。</td>
+<td>ie11</td>
+</tr>
+<tr>
+<td>HTMLElement.draggable</td>
+<td>设置或返回元素的可拖动状态。</td>
+<td>ie10-11</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>说明</th>
+<th>备注</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTMLElement.focus()</td>
+<td>获取焦点。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.blur()</td>
+<td>失去焦点。</td>
+<td></td>
+</tr>
+<tr>
+<td>HTMLElement.click()</td>
+<td>点击。</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/notes/images/wechatpay.jpg" alt="Yourz WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/notes/images/alipay.jpg" alt="Yourz Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/notes/tags/前端/" rel="tag"># 前端</a>
+          
+            <a href="/notes/tags/HTML/" rel="tag"># HTML</a>
+          
+            <a href="/notes/tags/DOM/" rel="tag"># DOM</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/notes/2015/04/10/closure/" rel="next" title="闭包">
+                <i class="fa fa-chevron-left"></i> 闭包
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/notes/2015/06/18/eventLoop/" rel="prev" title="EventLoop&webWorke">
+                EventLoop&webWorke <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/notes/images/avatar.jpg"
+               alt="Yourz" />
+          <p class="site-author-name" itemprop="name">Yourz</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/notes/archives/">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/notes/categories/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/notes/tags/index.html">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Yourz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/yaozhiwb" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      微博
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.instagram.com/krizma_l/" target="_blank" title="Instagram">
+                  
+                    <i class="fa fa-fw fa-instagram"></i>
+                  
+                    
+                      Instagram
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#继承关系"><span class="nav-number">1.</span> <span class="nav-text">继承关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础类型"><span class="nav-number">2.</span> <span class="nav-text">基础类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EventTarget"><span class="nav-number">2.1.</span> <span class="nav-text">EventTarget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Node"><span class="nav-number">2.2.</span> <span class="nav-text">Node</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Element"><span class="nav-number">2.3.</span> <span class="nav-text">Element</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTMLElement"><span class="nav-number">2.4.</span> <span class="nav-text">HTMLElement</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yourz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three.min.js"></script>
+
+  
+  <script type="text/javascript" src="/notes/lib/three/three-waves.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/notes/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/notes/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/notes/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/notes/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
