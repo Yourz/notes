@@ -124,14 +124,14 @@
 <meta property="og:site_name" content="Yourz Notes">
 <meta property="og:description" content="什么是跨域之所以有跨域(Cross-Origin, 也译作跨源)这种操作方式，是为了解决浏览器同源策略。同源，即协议相同、域名相同及端口相同。同源策略最早被网景引入是为了保证用户信息的安全，防止恶意的网站窃取数据。最初非同源限制是cookie，现在包括dom和xhr及fetch请求都不能跨域访问。 不受同源策略限制的情况也有很多，如：  &amp;lt;script src=&amp;quot;...&amp;quot;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg">
-<meta property="og:image" content="http://p1.meituan.net/scarlett/5f58e31785e93c1fb612e3ea8a9be8c474880.jpg">
-<meta property="og:image" content="http://p1.meituan.net/scarlett/74368f56cbc1acaf67375c5dbabb0cd2180206.jpg">
-<meta property="og:updated_time" content="2018-03-28T13:00:13.174Z">
+<meta property="og:image" content="https://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg">
+<meta property="og:image" content="https://p1.meituan.net/scarlett/5f58e31785e93c1fb612e3ea8a9be8c474880.jpg">
+<meta property="og:image" content="https://p1.meituan.net/scarlett/74368f56cbc1acaf67375c5dbabb0cd2180206.jpg">
+<meta property="og:updated_time" content="2018-03-29T04:17:37.560Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="跨域的原理及解决方案">
 <meta name="twitter:description" content="什么是跨域之所以有跨域(Cross-Origin, 也译作跨源)这种操作方式，是为了解决浏览器同源策略。同源，即协议相同、域名相同及端口相同。同源策略最早被网景引入是为了保证用户信息的安全，防止恶意的网站窃取数据。最初非同源限制是cookie，现在包括dom和xhr及fetch请求都不能跨域访问。 不受同源策略限制的情况也有很多，如：  &amp;lt;script src=&amp;quot;...&amp;quot;">
-<meta name="twitter:image" content="http://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg">
+<meta name="twitter:image" content="https://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg">
 
 
 
@@ -411,7 +411,7 @@
 </ol>
 <p>通过这些“例外”情况，就给了程序员们可乘之机，涌现出了许多奇技淫巧，这类跨域的解决方案姑且称之为hack流。</p>
 <p>与此同时，w3c听取了程序员们对于跨域请求的渴望，推出了cors标准，通过设置服务器以达到ajax的跨域请求，html5也适时推出了postMessage api以满足跨域通信。这种官方开门允许跨域的方法，我们姑且称之为正统流。</p>
-<h1 id="跨域访问的解决方案"><a href="#跨域访问的解决方案" class="headerlink" title="跨域访问的解决方案"></a>跨域访问的解决方案</h1><p>如上文所言，从原理上，跨域的解决方案可以大概分为正统流和hack流两大类。下面具体分别来介绍各种解决方法的实现。<br><img src="http://p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg" alt="Classification"></p>
+<h1 id="跨域访问的解决方案"><a href="#跨域访问的解决方案" class="headerlink" title="跨域访问的解决方案"></a>跨域访问的解决方案</h1><p>如上文所言，从原理上，跨域的解决方案可以大概分为正统流和hack流两大类。下面具体分别来介绍各种解决方法的实现。<br><img src="//p1.meituan.net/scarlett/9bec1083657edde42d059deb09809868108760.jpg" alt="Classification"></p>
 <h2 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h2><h3 id="Hack流"><a href="#Hack流" class="headerlink" title="Hack流"></a>Hack流</h3><h4 id="IMG-Ping——利用图片的跨域特性"><a href="#IMG-Ping——利用图片的跨域特性" class="headerlink" title="IMG Ping——利用图片的跨域特性"></a>IMG Ping——利用图片的跨域特性</h4><p>我们每天浏览很多的网页，有时候可能会发现某些图片（<code>&lt;img&gt;</code>）是来自其他网站的，其实你看到的就是一种跨域，由于图片不受“同源策略”限制，我们就可以利用图片进行跨域了。我们将图片的src属性指向请求的地址，通过监听load和error事件，就能知道响应什么时候接受了,响应的数据可以是任意内容，但通常是204响应（No content 没有响应体）。图像ping的例子如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> btn = <span class="built_in">document</span>.querySelector(<span class="string">"#start-ping"</span>); </span><br><span class="line">btn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; </span><br><span class="line">    <span class="keyword">var</span> img = <span class="keyword">new</span> Image();</span><br><span class="line">    img.onload = img.onerror = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">document</span>.querySelector(<span class="string">"#result"</span>).innerHTML = <span class="string">"finished"</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">    img.src = <span class="string">"http://localhost:3000/img?r="</span>+<span class="built_in">Math</span>.random();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
 <p>服务器端代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">router.get(<span class="string">'/img'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">req, res, next</span>) </span>&#123; </span><br><span class="line">  res.send(<span class="string">'success!'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 <p>然而在实际使用中会发现，无法获取相应文本。</p>
@@ -454,7 +454,7 @@
 <p>跨域资源共享标准新增了一组 HTTP 首部字段，允许服务器声明哪些源站有权限访问哪些资源。另外，规范要求，对那些可能对服务器数据产生副作用的 HTTP 请求方法（特别是 GET 以外的 HTTP 请求，或者搭配某些 MIME 类型的 POST 请求），浏览器必须首先使用 OPTIONS 方法发起一个预检请求（preflight request），从而获知服务端是否允许该跨域请求。服务器确认允许之后，才发起实际的 HTTP 请求。在预检请求的返回中，服务器端也可以通知客户端，是否需要携带身份凭证（包括 Cookies 和 HTTP 认证相关数据）。</p>
 <p>接下来的内容将讨论相关场景，并剖析该机制所涉及的 HTTP 首部字段。</p>
 <p>这里，我们使用三个场景来解释跨域资源共享机制的工作原理。这些例子都使用 XMLHttpRequest 对象。</p>
-<h5 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h5><p><img src="http://p1.meituan.net/scarlett/5f58e31785e93c1fb612e3ea8a9be8c474880.jpg" alt="Simple Request"></p>
+<h5 id="简单请求"><a href="#简单请求" class="headerlink" title="简单请求"></a>简单请求</h5><p><img src="//p1.meituan.net/scarlett/5f58e31785e93c1fb612e3ea8a9be8c474880.jpg" alt="Simple Request"></p>
 <p>某些请求不会触发 CORS 预检请求。称之为“简单请求”，请注意，该术语并不属于 Fetch （其中定义了 CORS）规范。若请求满足所有下述条件，则该请求可视为“简单请求”：</p>
 <ul>
 <li>使用下列方法之一：<ol>
@@ -528,7 +528,7 @@
 <p>否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。</p>
 <p>但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。这时，开发者可以在请求中显式关闭withCredentials。</p>
 <p>需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传。</p>
-<h5 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h5><p><img src="http://p1.meituan.net/scarlett/74368f56cbc1acaf67375c5dbabb0cd2180206.jpg" alt="Preview Request"><br>与前述简单请求不同，“需预检的请求”要求必须首先使用 OPTIONS   方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。”预检请求“的使用，可以避免跨域请求对服务器的用户数据产生未预期的影响。</p>
+<h5 id="预检请求"><a href="#预检请求" class="headerlink" title="预检请求"></a>预检请求</h5><p><img src="//p1.meituan.net/scarlett/74368f56cbc1acaf67375c5dbabb0cd2180206.jpg" alt="Preview Request"><br>与前述简单请求不同，“需预检的请求”要求必须首先使用 OPTIONS   方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。”预检请求“的使用，可以避免跨域请求对服务器的用户数据产生未预期的影响。</p>
 <p>当请求满足下述任一条件时，即应首先发送预检请求：</p>
 <ul>
 <li>使用了下面任一 HTTP 方法：<ol>
